@@ -9,6 +9,7 @@ const findAll = async () => {
 
   try {
     const result = await transaction.run("MATCH (u:User) RETURN u");
+    console.log(result.records[0].get("u").properties);
     const records = result.records.map((record) => record.get("u").properties);
     await transaction.commit();
 
@@ -64,9 +65,27 @@ const findByLoginOrEmail = async (login, email) => {
   }
 };
 
+const findByEmail = async (email) => {
+  const transaction = session.beginTransaction();
+
+  try {
+    const result = await transaction.run(
+      `MATCH (u:User) WHERE u.email = '${email}' RETURN u;`
+    );
+    await transaction.commit();
+    return result.records.length > 0
+      ? result.records[0].get("u").properties
+      : null;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
 module.exports = {
   findAll,
   findById,
   create,
+  findByEmail,
   findByLoginOrEmail,
 };

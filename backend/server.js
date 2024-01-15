@@ -114,7 +114,7 @@ function forwardAuthenticated(req, res, next) {
   if (!req.isAuthenticated()) {
     return next();
   }
-  res.status(402).json({ msg: "Already logged!" }); // if auth
+  res.status(405).json({ msg: "Already logged!" }); // if auth
 }
 
 app.use("/api", forwardAuthenticated, passportRoute);

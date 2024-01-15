@@ -5,14 +5,17 @@ const passport = require("passport");
 router.post(
   "/login",
   passport.authenticate("local", {
-    successRedirect: "/home",
-    failureRedirect: "/login",
+    failureRedirect: "/api/failure",
   }),
   (_req, res) => {
     console.log("Zalogowano");
-    res.send({ msg: "zalogowano" });
+    res.json({ msg: "Logged in" });
   }
 );
+
+router.get("/failure", (req, res) => {
+  res.status(401).json({ msg: "Invalid username or password" });
+});
 
 router.get("/logout", (req, res, next) => {
   req.logout((err) => {
@@ -20,7 +23,7 @@ router.get("/logout", (req, res, next) => {
       return next(err);
     }
     console.log("wylogowano");
-    res.redirect("/login");
+    res.send({ msg: "Log out" });
   });
 });
 

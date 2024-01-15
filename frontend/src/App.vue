@@ -1,13 +1,16 @@
 <template>
-  <div id="app">
-    <h2>Serwis Y</h2>'
-    <button v-on:click="sendMessage('helo')">Send Message</button>
-  </div>
+  <Navbar />
+  <router-view></router-view>
 </template>
 
 <script>
+import Navbar from './components/Navbar.vue'
+
 export default {
   name: "App",
+  components: {
+    Navbar
+  },
   data: function () {
     return {
       connection: null

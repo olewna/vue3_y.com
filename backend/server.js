@@ -3,6 +3,7 @@ require("dotenv").config();
 const fs = require("fs");
 const WebSocket = require("ws");
 const path = require("path");
+const cors = require("cors");
 const user = require("./routes/user.route");
 const post = require("./routes/post.route");
 const passportRoute = require("./routes/passport.route");
@@ -11,6 +12,14 @@ const passportLocal = require("passport-local");
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "x-requested-with"],
+  })
+);
 const userModel = require("./models/user.model");
 
 // HTTPS
@@ -71,14 +80,12 @@ const validateUser = async (email, password, done) => {
     done(err);
   }
 };
-
 passport.use(
   new passportLocal.Strategy(
     { usernameField: "email", passwordField: "password" },
     validateUser
   )
 );
-
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
   const user = await userModel.findById(id);
@@ -94,15 +101,25 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-app.use("/api", passportRoute);
-app.use(
-  "/api/users",
-  passport.authenticate("local", {
-    session: false,
-  }),
-  user
-);
-app.use("/api/posts", post);
+// jeśli nie zalogowany to cofa do /login
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(402).json({ msg: "Persmission denied!" });
+}
+
+// jeśli zalogowany to wyrzuca na /home
+function forwardAuthenticated(req, res, next) {
+  if (!req.isAuthenticated()) {
+    return next();
+  }
+  res.status(402).json({ msg: "Already logged!" }); // if auth
+}
+
+app.use("/api", forwardAuthenticated, passportRoute);
+app.use("/api/users", ensureAuthenticated, user);
+app.use("/api/posts", ensureAuthenticated, post);
 
 server.listen(process.env.PORT, () => {
   console.log(`Serwer Express działa na porcie ${process.env.PORT | 3044}`);

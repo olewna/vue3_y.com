@@ -14,7 +14,7 @@ export default {
     return apiClient.get("/");
   },
   getPostById(id) {
-    return apiClient.get("//" + id);
+    return apiClient.get("/" + id);
   },
   createPost(post) {
     return apiClient.post("/", post);

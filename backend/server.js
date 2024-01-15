@@ -53,7 +53,7 @@ wss.on("connection", (ws) => {
 app.use(
   require("express-session")({
     secret: process.env.APP_SECRET || "$sekretny $sekret",
-    resave: false,
+    resave: true,
     saveUninitialized: true,
   })
 );
@@ -103,10 +103,12 @@ passport.deserializeUser(async (id, done) => {
 
 // jeśli nie zalogowany to cofa do /login
 function ensureAuthenticated(req, res, next) {
+  console.log("REQ: " + req.isAuthenticated());
+  console.log(req.session);
   if (req.isAuthenticated()) {
     return next();
   }
-  res.status(402).json({ msg: "Persmission denied!" });
+  res.status(401).json({ msg: "Persmission denied!" });
 }
 
 // jeśli zalogowany to wyrzuca na /home
@@ -118,7 +120,7 @@ function forwardAuthenticated(req, res, next) {
 }
 
 app.use("/api", forwardAuthenticated, passportRoute);
-app.use("/api/users", ensureAuthenticated, user);
+app.use("/api/users", user);
 app.use("/api/posts", ensureAuthenticated, post);
 
 server.listen(process.env.PORT, () => {

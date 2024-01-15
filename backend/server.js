@@ -1,6 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const fs = require("fs");
+const WebSocket = require("ws");
 const path = require("path");
 const user = require("./routes/user.route");
 const post = require("./routes/post.route");
@@ -23,6 +24,21 @@ const server = require("https").createServer(
   },
   app
 );
+
+// WEBSOCKET
+const wss = new WebSocket.Server({ server });
+
+wss.on("connection", (ws) => {
+  console.log("Nowe połączenie WebSocket");
+
+  // Nasłuchiwanie wiadomości od klienta WebSocket
+  ws.on("message", (message) => {
+    console.log(`Odebrano wiadomość: ${message}`);
+  });
+
+  // Wysyłanie wiadomości do klienta WebSocket
+  ws.send("Witaj, połączono z serwerem WebSocket z SSL!");
+});
 
 // PASSPORT
 app.use(

@@ -1,4 +1,5 @@
 <template>
+    <Navbar :user="user" />
     <h1>Home!</h1>
     <div v-for="user in users">
         {{ user.login }}
@@ -6,15 +7,24 @@
 </template>
 
 <script>
-import userService from '../../service/userService';
-import { watchEffect } from "vue"
+import { watchEffect, computed } from "vue";
+import { mapGetters } from "vuex";
+import userService from '@/service/userService';
+import Navbar from '@/components/Navbar.vue'
+
 
 export default {
     name: "Home",
+    components: {
+        Navbar
+    },
     data() {
         return {
             users: null
         }
+    },
+    computed: {
+        ...mapGetters({ user: "getUser" })
     },
     created() {
         watchEffect(() => {

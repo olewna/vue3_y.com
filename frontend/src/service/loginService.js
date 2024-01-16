@@ -9,8 +9,6 @@ const apiClient = axios.create({
   },
 });
 
-const accountLogged = null;
-
 export default {
   login(user) {
     return apiClient.post("/login", user);

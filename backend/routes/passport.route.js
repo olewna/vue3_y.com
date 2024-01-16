@@ -7,9 +7,9 @@ router.post(
   passport.authenticate("local", {
     failureRedirect: "/api/failure",
   }),
-  (_req, res) => {
+  (req, res) => {
     console.log("Zalogowano");
-    res.json({ msg: "Logged in" });
+    res.json(req.user);
   }
 );
 

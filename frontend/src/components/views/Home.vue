@@ -1,5 +1,8 @@
 <template>
     <h1>Home!</h1>
+    <div v-for="user in users">
+        {{ user.login }}
+    </div>
 </template>
 
 <script>
@@ -25,6 +28,7 @@ export default {
                     // this.$router.push({ name: 'NetworkError' })
                 })
         })
+
     },
 }
 </script>

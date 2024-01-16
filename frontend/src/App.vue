@@ -24,7 +24,7 @@ export default {
   },
   created: function () {
     console.log("Starting web socket server");
-    this.connection = new WebSocket("wss://localhost:3069");
+    this.connection = new WebSocket("wss://localhost:3069/");
 
     this.connection.onmessage = function (event) {
       console.log(event.data)

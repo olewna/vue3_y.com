@@ -4,6 +4,7 @@ const fs = require("fs");
 const WebSocket = require("ws");
 const path = require("path");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const user = require("./routes/user.route");
 const post = require("./routes/post.route");
 const passportRoute = require("./routes/passport.route");
@@ -12,12 +13,42 @@ const passportLocal = require("passport-local");
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://localhost:5173");
+  // res.header("Access-Control-Allow-Origin", "https://172.19.160.1:5173");
+  // res.header("Access-Control-Allow-Origin", "https://172.19.193.51:5173");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
 app.use(
   cors({
+    origin: [
+      "https://localhost:5173",
+      "https://172.19.160.1:5173",
+      "https://172.19.193.51:5173",
+    ],
+    methods: ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["X-Requested-With", "content-type"],
     credentials: true,
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "x-requested-with"],
+  })
+);
+app.use(
+  require("express-session")({
+    secret: process.env.APP_SECRET || "$sekretny $sekret",
+    saveUninitialized: false,
+    resave: false,
+    expires: 1000 * 60 * 60 * 24 * 30,
+    cookie: {
+      sameSite: false,
+      secure: true,
+      httpOnly: true,
+    },
   })
 );
 const userModel = require("./models/user.model");
@@ -50,13 +81,6 @@ wss.on("connection", (ws) => {
 });
 
 // PASSPORT
-app.use(
-  require("express-session")({
-    secret: process.env.APP_SECRET || "$sekretny $sekret",
-    resave: true,
-    saveUninitialized: true,
-  })
-);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -86,15 +110,20 @@ passport.use(
     validateUser
   )
 );
-passport.serializeUser((user, done) => done(null, user.id));
+passport.serializeUser((user, done) => {
+  console.log("Serialized id: " + user.id);
+  done(null, user.id);
+});
 passport.deserializeUser(async (id, done) => {
   const user = await userModel.findById(id);
   try {
-    done(null, {
-      id: user._id,
-      email: user.email,
-      password: user.password,
-    });
+    if (user) {
+      done(null, {
+        id: user._id,
+        email: user.email,
+        password: user.password,
+      });
+    }
   } catch (error) {
     console.dir(`Błąd: ${error}`);
     done(error);
@@ -119,10 +148,10 @@ function forwardAuthenticated(req, res, next) {
   res.status(405).json({ msg: "Already logged!" }); // if auth
 }
 
-app.use("/api", forwardAuthenticated, passportRoute);
 app.use("/api/users", user);
 app.use("/api/posts", ensureAuthenticated, post);
+app.use("/api", forwardAuthenticated, passportRoute);
 
 server.listen(process.env.PORT, () => {
-  console.log(`Serwer Express działa na porcie ${process.env.PORT | 3044}`);
+  console.log(`Serwer Express działa na porcie ${process.env.PORT || 3044}`);
 });

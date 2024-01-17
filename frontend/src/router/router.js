@@ -3,6 +3,7 @@ import Home from "@/components/views/Home.vue";
 import Login from "@/components/views/Login.vue";
 import Register from "@/components/views/Register.vue";
 import PageNotFound from "@/components/views/PageNotFound.vue";
+import Account from "@/components/Account.vue";
 import store from "@/store/store.js";
 
 const routes = [
@@ -26,8 +27,10 @@ const routes = [
     component: Register,
   },
   {
-    path: "/account",
+    path: "/account/:id",
     name: "Account",
+    props: true,
+    component: Account,
   },
   {
     path: "/:pathMatch(.*)*",

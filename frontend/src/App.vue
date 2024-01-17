@@ -28,7 +28,14 @@ export default {
     this.connection.onopen = function (event) {
       console.log("success connection ")
     }
-  }
+  },
+  beforeCreate() {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      this.$store.commit('SET_USER', userData);
+      this.$store.commit("SET_ISLOGGED", true)
+    }
+  },
 }
 </script>
 

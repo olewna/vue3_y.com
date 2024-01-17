@@ -17,7 +17,6 @@
   
 <script>
 import loginService from '@/service/loginService';
-import { mapActions } from "vuex";
 
 export default {
     name: "Login",
@@ -29,15 +28,15 @@ export default {
         };
     },
     methods: {
-        ...mapActions(["setUser", "setIsLogged"]),
         login() {
             // W tym miejscu można wywołać funkcję logowania i przekazać dane do rodzica
             loginService.login({ email: this.email, password: this.password }).then((res) => {
-                this.setUser(res.data)
                 this.email = '';
                 this.password = '';
-                this.setIsLogged(true)
-                this.$router.push({ path: "/home" })
+
+                console.log(res.data)
+                localStorage.setItem("user", res.data);
+                this.$router.go("/home")
             }).catch((err) => {
                 console.log(err.response.data.msg)
                 this.msg = err.response.data.msg

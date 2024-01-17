@@ -140,17 +140,9 @@ function ensureAuthenticated(req, res, next) {
   res.status(401).json({ msg: "Persmission denied!" });
 }
 
-// jeśli zalogowany to wyrzuca na /home
-function forwardAuthenticated(req, res, next) {
-  if (!req.isAuthenticated()) {
-    return next();
-  }
-  res.status(405).json({ msg: "Already logged!" }); // if auth
-}
-
 app.use("/api/users", user);
 app.use("/api/posts", ensureAuthenticated, post);
-app.use("/api", forwardAuthenticated, passportRoute);
+app.use("/api", passportRoute);
 
 server.listen(process.env.PORT, () => {
   console.log(`Serwer Express działa na porcie ${process.env.PORT || 3044}`);

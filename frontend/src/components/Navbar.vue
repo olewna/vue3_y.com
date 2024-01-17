@@ -23,6 +23,8 @@ export default {
         logout() {
             loginService.logout().then(res => {
                 console.log("wylogowano");
+                localStorage.removeItem("user")
+                this.$router.go("/login");
             }).catch((err) => {
                 console.log(err)
             })

@@ -42,7 +42,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.path !== "/login" && !store.state.logged) {
+  if (to.path !== "/login" && to.path !== "/register" && !store.state.logged) {
     next("/login");
   } else {
     // W przeciwnym razie, pozwól mu przejść dalej

@@ -20,6 +20,7 @@
   
 <script>
 import userService from "@/service/userService"
+import { v4 as uuidv4 } from 'uuid';
 
 export default {
     name: "Register",
@@ -33,16 +34,14 @@ export default {
     },
     methods: {
         register() {
-            // W tym miejscu można wywołać funkcję logowania i przekazać dane do rodzica
-            userService.createUser({ login: this.login, email: this.email, password: this.password }).then((res) => {
+            userService.createUser({ id: uuidv4(), login: this.login, email: this.email, password: this.password }).then((res) => {
                 console.log(res);
-                this.$router.push({ path: "/login" })
+                this.$router.go("/login")
             }).catch((err) => {
                 console.log(err.response.data.msg)
                 this.msg = err.response.data.msg
             });
 
-            // Opcjonalnie, można wyczyścić pola formularza po zalogowaniu
             this.login = '';
             this.email = '';
             this.password = '';

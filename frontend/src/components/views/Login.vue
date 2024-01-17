@@ -10,8 +10,8 @@
 
             <button type="submit">Zaloguj</button>
             <div>{{ this.msg }}</div>
-            <router-link to="/register">Zarejestuj się</router-link>
         </form>
+        <router-link to="/register">Zarejestuj się</router-link>
     </div>
 </template>
   
@@ -35,7 +35,7 @@ export default {
                 this.password = '';
 
                 console.log(res.data)
-                localStorage.setItem("user", res.data);
+                localStorage.setItem("user", JSON.stringify(res.data));
                 this.$router.go("/home")
             }).catch((err) => {
                 console.log(err.response.data.msg)

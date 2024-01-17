@@ -31,8 +31,9 @@ export default {
   },
   beforeCreate() {
     const userData = localStorage.getItem('user');
+    console.log(JSON.parse(userData))
     if (userData) {
-      this.$store.commit('SET_USER', userData);
+      this.$store.commit('SET_USER', JSON.parse(userData));
       this.$store.commit("SET_ISLOGGED", true)
     }
   },

@@ -22,6 +22,9 @@ export default {
   followUser(users) {
     return apiClient.post("/follow", users);
   },
+  unfollowUser(users) {
+    return apiClient.post("/unfollow", users);
+  },
   getFollowedUsers(id) {
     return apiClient.get("/follow/" + id);
   },

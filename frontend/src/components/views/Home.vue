@@ -46,7 +46,7 @@ export default {
         }
     },
     methods: {
-        getData: function () {
+        getData() {
             postsService.getPosts()
                 .then(res => {
                     console.log(res.data);

@@ -36,7 +36,7 @@ const findNotFollowedUsers = async (id) => {
     const result = await session.run(
       `MATCH (u:User {id: '${id}'})
       MATCH (user:User)
-      WHERE NOT (u)-[:Follows]->(user)
+      WHERE NOT (u)-[:Follows]->(user) AND user.id <> '${id}'
       RETURN user;`
     );
     const records = result.records.map(
@@ -77,12 +77,33 @@ const create = async (user) => {
 const createFollowRelation = async (follows, isFollowed) => {
   const session = driver.session({ database: DB });
   try {
-    await session.run(
-      `MATCH (follower:User {id: '${follows}'), (following:User {id: '${isFollowed}')
+    const result = await session.run(
+      `MATCH (follower:User {id: '${follows}'}), (following:User {id: '${isFollowed}'})
       CREATE (follower)-[:Follows]->(following)
       RETURN follower, following;`
     );
-    return await findById(follows);
+    return {
+      follower: result.records[0].get("follower").properties,
+      following: result.records[0].get("following").properties,
+    };
+  } finally {
+    await session.close();
+  }
+};
+
+const deleteFollowRelation = async (follows, isFollowed) => {
+  const session = driver.session({ database: DB });
+  try {
+    const result = await session.run(
+      `MATCH (follower:User {id: '${follows}'})-[rel:Follows]->(following:User {id: '${isFollowed}'})
+      DELETE rel
+      RETURN follower, following;
+      `
+    );
+    return {
+      follower: result.records[0].get("follower").properties,
+      following: result.records[0].get("following").properties,
+    };
   } finally {
     await session.close();
   }
@@ -122,6 +143,7 @@ module.exports = {
   findNotFollowedUsers,
   create,
   createFollowRelation,
+  deleteFollowRelation,
   findByEmail,
   findByLoginOrEmail,
 };

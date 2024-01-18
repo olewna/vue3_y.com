@@ -3,12 +3,12 @@
         <div>Obserwowani:</div>
         <div class="followed" v-if="followedUsers" v-for="user in followedUsers">
             {{ user.login }}
-            <button>Przestań obserwować</button>
+            <button @click="unfollow(user.id)">Przestań obserwować</button>
         </div>
         <div>Możliwe, że znasz:</div>
         <div class="not-followed" v-if="notFollowedUsers" v-for="user in notFollowedUsers">
             {{ user.login }}
-            <button>Obserwuj</button>
+            <button @click="follow(user.id)">Obserwuj</button>
         </div>
     </div>
 </template>
@@ -25,6 +25,28 @@ export default {
         return {
             followedUsers: null,
             notFollowedUsers: null
+        }
+    },
+    methods: {
+        unfollow(userIdToUnfollow) {
+            userService.unfollowUser({ follow: this.user.id, isFollowed: userIdToUnfollow }).then(res => {
+                console.log(res.data)
+                this.$router.go("/home");
+            }).catch(err => {
+                console.log(err);
+                localStorage.removeItem("user")
+                this.$router.go("/login");
+            })
+        },
+        follow(userIdToFollow) {
+            userService.followUser({ follow: this.user.id, isFollowed: userIdToFollow }).then(res => {
+                console.log(res.data)
+                this.$router.go("/home");
+            }).catch(err => {
+                console.log(err);
+                localStorage.removeItem("user")
+                this.$router.go("/login");
+            })
         }
     },
     mounted() {
@@ -49,5 +71,33 @@ export default {
 <style scoped>
 .users {
     min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.followed,
+.not-followed {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 300px;
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
 </style>

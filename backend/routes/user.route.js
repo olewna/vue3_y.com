@@ -53,4 +53,28 @@ user.post("/", async (req, res) => {
   }
 });
 
+user.post("/follow", authMiddleware, async (req, res) => {
+  if (!bodyNotEmpty(req.body)) {
+    res.status(401).send("Body is missing parameters");
+  }
+  console.log("POST user /follow");
+  const user = await userModel.createFollowRelation(
+    req.body.follow,
+    req.body.isFollowed
+  );
+  res.json(user);
+});
+
+user.get("/follow/:id", authMiddleware, async (req, res) => {
+  const result = await userModel.findFollowedUsers(req.params.id);
+  console.log("GET followed /follow/:id");
+  res.json(result);
+});
+
+user.get("/notfollow/:id", authMiddleware, async (req, res) => {
+  const result = await userModel.findNotFollowedUsers(req.params.id);
+  console.log("GET notfollowed /notfollow/:id");
+  res.json(result);
+});
+
 module.exports = user;

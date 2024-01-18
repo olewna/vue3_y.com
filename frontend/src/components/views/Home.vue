@@ -1,10 +1,13 @@
 <template>
     <Navbar :user="user" />
-    <div class="home">
-        <h1>Home!</h1>
-        <PostForm />
-        <Post v-if="postsExists" v-for="post in posts" :key="post.id" :post="post" />
-        <div v-else>No posts...</div>
+    <div class="body">
+        <Aside :user="user" />
+        <div class="home">
+            <h1>Home!</h1>
+            <PostForm />
+            <Post v-if="postsExists" v-for="post in posts" :key="post.id" :post="post" />
+            <div v-else>No posts...</div>
+        </div>
     </div>
 </template>
 
@@ -16,6 +19,7 @@ import postsService from '@/service/postsService';
 import Navbar from '@/components/Navbar.vue'
 import Post from '@/components/Post.vue'
 import PostForm from '@/components/PostForm.vue'
+import Aside from "@/components/Aside.vue";
 import router from "@/router/router.js"
 
 
@@ -24,11 +28,11 @@ export default {
     components: {
         Navbar,
         Post,
-        PostForm
+        PostForm,
+        Aside
     },
     data() {
         return {
-            users: null,
             posts: null
         }
     },
@@ -43,25 +47,15 @@ export default {
     },
     methods: {
         getData: function () {
-            userService.getUsers()
-                .then(response => {
-                    this.users = response.data;
-                    postsService.getPosts()
-                        .then(res => {
-                            console.log(res.data);
-                            this.posts = res.data;
-                        })
-                        .catch(err => {
-                            console.log(err);
-                            localStorage.removeItem("user")
-                            this.$router.go("/login");
-                        })
+            postsService.getPosts()
+                .then(res => {
+                    console.log(res.data);
+                    this.posts = res.data;
                 })
                 .catch(err => {
                     console.log(err);
                     localStorage.removeItem("user")
                     this.$router.go("/login");
-                    // this.$router.push({ name: 'NetworkError' })
                 })
         }
     },
@@ -72,6 +66,10 @@ export default {
 </script>
 
 <style scoped>
+.body {
+    display: flex;
+}
+
 .home {
     max-width: 500px;
     margin: 0 auto;

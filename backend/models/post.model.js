@@ -5,10 +5,9 @@ const driver = neo4j.driver(URL, neo4j.auth.basic(DB_USERNAME, DB_PASSWORD));
 const session = driver.session({ DB });
 
 const findAll = async () => {
-  const transaction = session.beginTransaction();
+  const session = driver.session({ database: DB });
   try {
-    const result =
-      await transaction.run(`MATCH (post:Post)<-[:Wrote]-(user:User)
+    const result = await session.run(`MATCH (post:Post)<-[:Wrote]-(user:User)
     RETURN post, user.login AS author, user.id AS authorId`);
     const records = result.records.map((record) => {
       const postProperties = record.get("post").properties;
@@ -16,33 +15,29 @@ const findAll = async () => {
       const authorId = record.get("authorId");
       return { ...postProperties, author, authorId };
     });
-    await transaction.commit();
     return records;
-  } catch (error) {
-    await transaction.rollback();
-    throw error;
+  } finally {
+    await session.close();
   }
 };
 
 const findById = async (id) => {
-  const transaction = session.beginTransaction();
+  const session = driver.session({ database: DB });
   try {
-    const result = await transaction.run(
+    const result = await session.run(
       `MATCH (u:Post {id : '${id}'} ) RETURN u LIMIT 1`
     );
     const records = result.records[0].get("u").properties;
-    await transaction.commit();
     return records;
-  } catch (error) {
-    await transaction.rollback();
-    throw error;
+  } finally {
+    await session.close();
   }
 };
 
 const findPostsByUserId = async (id) => {
-  const transaction = session.beginTransaction();
+  const session = driver.session({ database: DB });
   try {
-    const result = await transaction.run(
+    const result = await session.run(
       `MATCH (user:User {id: '${id}'})-[:Wrote]->(post:Post)
       RETURN post, user.login AS author`
     );
@@ -51,11 +46,9 @@ const findPostsByUserId = async (id) => {
       const author = record.get("author");
       return { ...postProperties, author };
     });
-    await transaction.commit();
     return records;
-  } catch (error) {
-    await transaction.rollback();
-    throw error;
+  } finally {
+    await session.close();
   }
 };
 
@@ -65,15 +58,13 @@ const create = async (post) => {
     CREATE (user)-[:Wrote]->(post:Post {id: '${post.id}', body: '${post.body}'})
     RETURN post
   `;
-  const transaction = session.beginTransaction();
+  const session = driver.session({ database: DB });
 
   try {
-    await transaction.run(createRelationQuery);
-    await transaction.commit();
+    await session.run(createRelationQuery);
     return await findById(post.id);
-  } catch (error) {
-    await transaction.rollback();
-    throw error;
+  } finally {
+    await session.close();
   }
 };
 

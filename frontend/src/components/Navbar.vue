@@ -2,7 +2,7 @@ import loginService from '@/service/loginService';
 <template>
     <div class="navbar">
         <div class="brand">„Serwis Y”</div> |
-        <router-link to="/home" class="nav-link">Lista osób</router-link> |
+        <router-link to="/home" class="nav-link">Strona główna</router-link> |
         <router-link class="account nav-link" :to="'/account/' + this.user.id">
             Konto {{ user.login }} <img src="@/assets/awatar.jpg" alt="awatar_default">
         </router-link> |
@@ -42,7 +42,7 @@ export default {
     padding: 10px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-around;
 }
 
 .brand {

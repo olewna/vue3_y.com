@@ -19,4 +19,13 @@ export default {
   createUser(user) {
     return apiClient.post("/", user);
   },
+  followUser(users) {
+    return apiClient.post("/follow", users);
+  },
+  getFollowedUsers(id) {
+    return apiClient.get("/follow/" + id);
+  },
+  getNotFollowedUsers(id) {
+    return apiClient.get("/notfollow/" + id);
+  },
 };

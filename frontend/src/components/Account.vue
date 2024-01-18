@@ -10,9 +10,10 @@
             </div>
         </div>
         <router-link class="home" to="/home">Strona główna</router-link>
-        <div class="posts">
+        <div v-if="postsExists" class="posts">
             <Post v-for="post in posts" :key="post.id" :post="post" />
         </div>
+        <div v-else>Użytkownik nie ma postów...</div>
     </div>
 </template>
 
@@ -31,6 +32,14 @@ export default {
         return {
             user: null,
             posts: null
+        }
+    },
+    computed: {
+        postsExists() {
+            if (this.posts && this.posts.length > 0) {
+                return true
+            }
+            return false
         }
     },
     created() {

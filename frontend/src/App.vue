@@ -11,12 +11,6 @@ export default {
       connection: null
     }
   },
-  methods: {
-    sendMessage: function (message) {
-      console.log("wysłano wiadomość: " + message);
-      this.connection.send(message);
-    }
-  },
   created: function () {
     console.log("Starting web socket server");
     this.connection = new WebSocket("wss://localhost:3069/");

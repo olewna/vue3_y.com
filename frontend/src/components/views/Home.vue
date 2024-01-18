@@ -1,8 +1,9 @@
 <template>
     <Navbar :user="user" />
     <h1>Home!</h1>
-
-    <Post v-for="post in posts" :key="post.id" :post="post" />
+    <PostForm />
+    <Post v-if="postsExists" v-for="post in posts" :key="post.id" :post="post" />
+    <div v-else>No posts...</div>
 </template>
 
 <script>
@@ -12,13 +13,15 @@ import userService from '@/service/userService';
 import postsService from '@/service/postsService';
 import Navbar from '@/components/Navbar.vue'
 import Post from '@/components/Post.vue'
+import PostForm from '@/components/PostForm.vue'
 
 
 export default {
     name: "Home",
     components: {
         Navbar,
-        Post
+        Post,
+        PostForm
     },
     data() {
         return {
@@ -27,17 +30,23 @@ export default {
         }
     },
     computed: {
-        ...mapGetters({ user: "getUser" })
+        ...mapGetters({ user: "getUser" }),
+        postsExists() {
+            if (this.posts && this.posts.length > 0) {
+                return true
+            }
+            return false
+        }
     },
-    created() {
+    mounted() {
         watchEffect(() => {
             this.users = null;
             userService.getUsers()
                 .then(response => {
                     this.users = response.data;
                     postsService.getPosts()
-                        .then(response => {
-                            this.posts = response.data;
+                        .then(res => {
+                            this.posts = res.data;
                         })
                         .catch(err => {
                             console.log(err);
@@ -51,8 +60,9 @@ export default {
                     this.$router.go("/login");
                     // this.$router.push({ name: 'NetworkError' })
                 })
-
         })
+    },
+    created() {
 
     },
 }

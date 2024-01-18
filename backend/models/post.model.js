@@ -35,7 +35,7 @@ const findById = async (id) => {
 const create = async (post) => {
   const createRelationQuery = `
     MATCH (user:User {login: '${post.author}'})
-    CREATE (user)-[:Wrote]->(post:Post {id: '${post.id}', title: '${post.title}', body: '${post.body}''})
+    CREATE (user)-[:Wrote]->(post:Post {id: '${post.id}', body: '${post.body}'})
     RETURN post
   `;
   const transaction = session.beginTransaction();

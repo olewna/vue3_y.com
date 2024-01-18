@@ -38,11 +38,11 @@ export default {
     methods: {
         register() {
             userService.createUser({ id: uuidv4(), login: this.login, email: this.email, password: this.password }).then((res) => {
-                console.log(res);
+                // console.log(res);
                 this.$router.go("/login")
             }).catch((err) => {
-                console.log(err.response.data.msg)
-                this.msg = err.response.data.msg
+                console.log(err)
+                // this.msg = err.response.data.msg
             });
 
             this.login = '';

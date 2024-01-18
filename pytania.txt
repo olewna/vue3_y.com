@@ -1,0 +1,6 @@
+Pytania o sesje użytkownika.
+Czy dobrze jest zaszyfrowane frontend i backend?
+Czy awatar to moze być defaultowe zdjęcie z assetsów?
+Jak dodać proxy do każdego adresu?
+Do czego najlepiej użyć watch, a do czego computed.
+O co chodzi z podpunktem: Obserwowanie użytkownika powoduje, że jego wpisy (pochodzące ze zdefiniowanego przez nas „okienka czasowego”), których dotychczas nie widzieliśmy pojawiają się na naszej „stronie głównej” Serwisu-Y.

@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 import postsService from '@/service/postsService';
 
 export default {
-    name: "Register",
+    name: "PostForm",
     data() {
         return {
             body: '',
@@ -24,13 +24,13 @@ export default {
     },
     methods: {
         createPost() {
-            postsService.createPost({ id: uuidv4(), body: this.body }).then((res) => {
+            postsService.createPost({ id: uuidv4(), body: this.body, author: this.$store.state.user.login }).then((res) => {
                 console.log(res);
                 this.$router.go("/home")
                 // websocket dodac do powiadamiania uzytkowników !!!
             }).catch((err) => {
-                console.log(err.response.data.msg)
-                this.msg = err.response.data.msg
+                console.log(err)
+                // this.msg = err
             });
 
             this.login = '';

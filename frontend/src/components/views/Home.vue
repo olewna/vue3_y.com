@@ -16,6 +16,7 @@ import postsService from '@/service/postsService';
 import Navbar from '@/components/Navbar.vue'
 import Post from '@/components/Post.vue'
 import PostForm from '@/components/PostForm.vue'
+import router from "@/router/router.js"
 
 
 export default {
@@ -40,9 +41,8 @@ export default {
             return false
         }
     },
-    mounted() {
-        watchEffect(() => {
-            this.users = null;
+    methods: {
+        getData: function () {
             userService.getUsers()
                 .then(response => {
                     this.users = response.data;
@@ -63,10 +63,10 @@ export default {
                     this.$router.go("/login");
                     // this.$router.push({ name: 'NetworkError' })
                 })
-        })
+        }
     },
-    created() {
-
+    mounted() {
+        this.getData();
     },
 }
 </script>

@@ -5,6 +5,7 @@ const WebSocket = require("ws");
 const path = require("path");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 const user = require("./routes/user.route");
 const post = require("./routes/post.route");
 const passportRoute = require("./routes/passport.route");
@@ -15,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://localhost:5173");
+  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
   // res.header("Access-Control-Allow-Origin", "https://172.19.160.1:5173");
   // res.header("Access-Control-Allow-Origin", "https://172.19.193.51:5173");
   res.header(
@@ -29,9 +30,9 @@ app.use((req, res, next) => {
 app.use(
   cors({
     origin: [
-      "https://localhost:5173",
-      "https://172.19.160.1:5173",
-      "https://172.19.193.51:5173",
+      "http://localhost:5173",
+      // "https://172.19.160.1:5173",
+      // "https://172.19.193.51:5173",
     ],
     methods: ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["X-Requested-With", "content-type"],
@@ -39,31 +40,34 @@ app.use(
   })
 );
 app.use(
+  cookieSession({
+    name: "mysession",
+    keys: ["$sekretny $sekret"],
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  })
+);
+app.use(
   require("express-session")({
     secret: process.env.APP_SECRET || "$sekretny $sekret",
     saveUninitialized: false,
     resave: false,
-    expires: 1000 * 60 * 60 * 24 * 30,
-    cookie: {
-      sameSite: false,
-      secure: true,
-      httpOnly: true,
-    },
   })
 );
 const userModel = require("./models/user.model");
 
 // HTTPS
 
-const sslKeyPath = path.join(__dirname, "ssl", "example.key");
-const sslCrtPath = path.join(__dirname, "ssl", "example.crt");
-const server = require("https").createServer(
-  {
-    key: fs.readFileSync(sslKeyPath),
-    cert: fs.readFileSync(sslCrtPath),
-  },
-  app
-);
+const server = require("http").createServer(app);
+
+// const sslKeyPath = path.join(__dirname, "ssl", "example.key");
+// const sslCrtPath = path.join(__dirname, "ssl", "example.crt");
+// const server = require("https").createServer(
+//   {
+//     key: fs.readFileSync(sslKeyPath),
+//     cert: fs.readFileSync(sslCrtPath),
+//   },
+//   app
+// );
 
 // WEBSOCKET
 const wss = new WebSocket.Server({ server });
@@ -100,7 +104,7 @@ const validateUser = async (email, password, done) => {
       done(null, null);
     }
   } catch (err) {
-    console.log(`Błąd: ${err}`);
+    console.log(`Błąd walidacji użytkownika: ${err}`);
     done(err);
   }
 };
@@ -131,17 +135,16 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // jeśli nie zalogowany to cofa do /login
-function ensureAuthenticated(req, res, next) {
-  console.log("REQ: " + req.isAuthenticated());
-  console.log(req.session);
-  if (req.isAuthenticated()) {
+const authMiddleware = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).send("You are not authenticated");
+  } else {
     return next();
   }
-  res.status(401).json({ msg: "Persmission denied!" });
-}
+};
 
 app.use("/api/users", user);
-app.use("/api/posts", ensureAuthenticated, post);
+app.use("/api/posts", authMiddleware, post);
 app.use("/api", passportRoute);
 
 server.listen(process.env.PORT, () => {

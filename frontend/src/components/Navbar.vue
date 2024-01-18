@@ -3,7 +3,7 @@ import loginService from '@/service/loginService';
     <div class="navbar">
         <div class="brand">„Serwis Y”</div> |
         <router-link to="/home" class="nav-link">Lista osób</router-link> |
-        <router-link class="account nav-link" :to="'/account/' + user.id">
+        <router-link class="account nav-link" :to="'/account/' + this.user.id">
             Konto {{ user.login }} <img src="@/assets/awatar.jpg" alt="awatar_default">
         </router-link> |
         <div class="logout nav-link" @click="logout">Wyloguj</div>
@@ -16,10 +16,7 @@ import loginService from "@/service/loginService.js";
 export default {
     name: "Navbar",
     props: {
-        user: {
-            type: Object,
-            required: true
-        }
+        user: Object
     },
     methods: {
         logout() {
@@ -31,6 +28,9 @@ export default {
                 console.log(err)
             })
         }
+    },
+    mounted() {
+        console.log(this.user)
     }
 }
 </script>

@@ -9,7 +9,6 @@ const findAll = async () => {
 
   try {
     const result = await transaction.run("MATCH (u:User) RETURN u");
-    console.log(result.records[0].get("u").properties);
     const records = result.records.map((record) => record.get("u").properties);
     await transaction.commit();
 

@@ -5,12 +5,12 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  server: {
-    https: {
-      key: fs.readFileSync("./ssl/example.key"),
-      cert: fs.readFileSync("./ssl/example.crt"),
-    },
-  },
+  // server: {
+  //   https: {
+  //     key: fs.readFileSync("./ssl/example.key"),
+  //     cert: fs.readFileSync("./ssl/example.crt"),
+  //   },
+  // },
   plugins: [vue()],
   resolve: {
     alias: {

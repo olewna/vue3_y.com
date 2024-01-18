@@ -20,6 +20,7 @@
   
 <script>
 import loginService from '@/service/loginService';
+import router from "@/router/router.js"
 
 export default {
     name: "Login",
@@ -32,24 +33,24 @@ export default {
     },
     methods: {
         login() {
-            // W tym miejscu można wywołać funkcję logowania i przekazać dane do rodzica
             loginService.login({ email: this.email, password: this.password }).then((res) => {
                 this.email = '';
                 this.password = '';
 
-                console.log(res.data)
+                console.log("Zalogowano")
+                console.log(res)
                 localStorage.setItem("user", JSON.stringify(res.data));
                 this.$router.go("/home")
             }).catch((err) => {
-                console.log(err.response.data.msg)
-                this.msg = err.response.data.msg
+                console.log("Problem z logowaniem")
+                this.msg = "Problem z logowaniem"
             });
         }
     },
     created() {
         console.log(this.$store.state.logged)
         if (this.$store.state.logged) {
-            this.$router.push('/home');
+            router.push('/home');
         }
     },
 };

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: `https://localhost:3069/api/users`,
+  baseURL: `http://localhost:3069/api/users`,
   withCredentials: true,
   headers: {
     Accept: "application/json",
@@ -18,11 +18,5 @@ export default {
   },
   createUser(user) {
     return apiClient.post("/", user);
-  },
-  updateUser(id, user) {
-    return apiClient.put("/" + id, user);
-  },
-  deletePost(id) {
-    return apiClient.delete("/" + id);
   },
 };

@@ -46,6 +46,7 @@ export default {
                     this.users = response.data;
                     postsService.getPosts()
                         .then(res => {
+                            console.log(res.data);
                             this.posts = res.data;
                         })
                         .catch(err => {

@@ -16,6 +16,9 @@ export default {
   getPostById(id) {
     return apiClient.get("/" + id);
   },
+  getPostsByUserId(id) {
+    return apiClient.get("/user/" + id);
+  },
   createPost(post) {
     return apiClient.post("/", post);
   },

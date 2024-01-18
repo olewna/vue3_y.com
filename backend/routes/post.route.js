@@ -27,6 +27,12 @@ post.get("/:id", async (req, res) => {
   res.json(result);
 });
 
+post.get("/user/:id", async (req, res) => {
+  const result = await postModel.findPostsByUserId(req.params.id);
+  console.log("GET user posts /user/:id");
+  res.json(result);
+});
+
 post.post("/", async (req, res) => {
   if (!bodyNotEmpty(req.body)) {
     res.status(401).send("Body is missing parameters");

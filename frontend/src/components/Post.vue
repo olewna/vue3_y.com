@@ -1,6 +1,9 @@
 <template>
     <div class="post">
-        <h1>{{ post.body }}</h1>
+        <router-link :to="'/account/' + post.authorId">&#64;{{ post.author }}</router-link>
+        <div>{{ post.body }}</div>
+        <button>Cytuj</button>
+        <button>Odpowiedz</button>
     </div>
 </template>
   

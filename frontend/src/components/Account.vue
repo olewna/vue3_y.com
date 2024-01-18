@@ -9,27 +9,42 @@
                 <h3>{{ user.email }}</h3>
             </div>
         </div>
+        <Post v-for="post in posts" :key="post.id" :post="post" />
         <router-link to="/home">Strona główna</router-link>
     </div>
 </template>
 
 <script>
 import userService from '@/service/userService';
+import postsService from '@/service/postsService.js';
+import Post from "@/components/Post.vue";
 
 export default {
     name: 'Account',
     props: ['id'],
+    components: {
+        Post
+    },
     data() {
         return {
             user: null,
+            posts: null
         }
     },
     created() {
         userService.getUserById(this.$props.id).then((response) => {
             this.user = response.data;
-            console.log(response.data)
+            postsService.getPostsByUserId(this.$props.id).then((res) => {
+                this.posts = res.data;
+            }).catch(err => {
+                console.log(err);
+                localStorage.removeItem("user")
+                this.$router.go("/login");
+            })
         }).catch(err => {
             console.log(err);
+            localStorage.removeItem("user")
+            this.$router.go("/login");
         })
     }
 }

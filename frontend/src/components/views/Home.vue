@@ -1,9 +1,11 @@
 <template>
     <Navbar :user="user" />
-    <h1>Home!</h1>
-    <PostForm />
-    <Post v-if="postsExists" v-for="post in posts" :key="post.id" :post="post" />
-    <div v-else>No posts...</div>
+    <div class="home">
+        <h1>Home!</h1>
+        <PostForm />
+        <Post v-if="postsExists" v-for="post in posts" :key="post.id" :post="post" />
+        <div v-else>No posts...</div>
+    </div>
 </template>
 
 <script>
@@ -68,3 +70,10 @@ export default {
     },
 }
 </script>
+
+<style scoped>
+.home {
+    max-width: 500px;
+    margin: 0 auto;
+}
+</style>

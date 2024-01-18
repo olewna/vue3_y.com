@@ -9,8 +9,10 @@
                 <h3>{{ user.email }}</h3>
             </div>
         </div>
-        <Post v-for="post in posts" :key="post.id" :post="post" />
-        <router-link to="/home">Strona główna</router-link>
+        <router-link class="home" to="/home">Strona główna</router-link>
+        <div class="posts">
+            <Post v-for="post in posts" :key="post.id" :post="post" />
+        </div>
     </div>
 </template>
 
@@ -82,9 +84,18 @@ img {
     border: 2px solid #ccc;
 }
 
-router-link {
-    margin-top: 20px;
+.home {
+    padding: 10px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
     text-decoration: none;
-    color: #3498db;
+    margin: 10px 0;
+}
+
+.home:hover {
+    background-color: #2980b9;
 }
 </style>

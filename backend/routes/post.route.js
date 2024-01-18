@@ -15,8 +15,8 @@ const bodyNotEmpty = (obj) => {
   return true;
 };
 
-post.get("/", async (req, res) => {
-  const result = await postModel.findAll();
+post.get("/all/:id", async (req, res) => {
+  const result = await postModel.findAll(req.params.id);
   console.log("GET post /");
   res.json(result);
 });

@@ -4,7 +4,7 @@
         <Aside :user="user" />
         <div class="home">
             <h1>Home!</h1>
-            <PostForm />
+            <PostForm :refreshPosts="addComponentKey" />
             <Post v-if="postsExists" v-for="post in posts" :key="post.id" :post="post" />
             <div v-else>No posts...</div>
         </div>
@@ -33,7 +33,8 @@ export default {
     },
     data() {
         return {
-            posts: null
+            posts: null,
+            componentKey: 0
         }
     },
     computed: {
@@ -45,9 +46,14 @@ export default {
             return false
         }
     },
+    watch: {
+        componentKey() {
+            this.getData();
+        }
+    },
     methods: {
         getData() {
-            postsService.getPosts()
+            postsService.getPosts(this.user.id)
                 .then(res => {
                     console.log(res.data);
                     this.posts = res.data;
@@ -57,6 +63,9 @@ export default {
                     localStorage.removeItem("user")
                     this.$router.go("/login");
                 })
+        },
+        addComponentKey() {
+            this.componentKey += 1;
         }
     },
     mounted() {

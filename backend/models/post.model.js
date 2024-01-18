@@ -2,13 +2,21 @@ const neo4j = require("neo4j-driver");
 require("dotenv").config();
 const { URL, DB_USERNAME, DB_PASSWORD, DB } = process.env;
 const driver = neo4j.driver(URL, neo4j.auth.basic(DB_USERNAME, DB_PASSWORD));
-const session = driver.session({ DB });
 
-const findAll = async () => {
+const findAll = async (id) => {
   const session = driver.session({ database: DB });
   try {
-    const result = await session.run(`MATCH (post:Post)<-[:Wrote]-(user:User)
-    RETURN post, user.login AS author, user.id AS authorId`);
+    const result =
+      await session.run(`MATCH (follower:User {id: '${id}'})-[:Follows]->(followed:User)
+      MATCH (followed)-[:Wrote]->(post:Post)
+      WITH post, followed.id AS authorId, followed.login AS author
+      RETURN post, authorId, author
+      
+      UNION
+      
+      MATCH (user:User {id: '${id}'})-[:Wrote]->(post:Post)
+      RETURN post, user.id AS authorId, user.login AS author
+    `);
     const records = result.records.map((record) => {
       const postProperties = record.get("post").properties;
       const author = record.get("author");

@@ -24,14 +24,16 @@ export default {
     data() {
         return {
             followedUsers: null,
-            notFollowedUsers: null
+            notFollowedUsers: null,
+            componentKey: 0
         }
     },
     methods: {
         unfollow(userIdToUnfollow) {
             userService.unfollowUser({ follow: this.user.id, isFollowed: userIdToUnfollow }).then(res => {
                 console.log(res.data)
-                this.$router.go("/home");
+                this.componentKey += 1;
+                // this.$router.go("/home");
             }).catch(err => {
                 console.log(err);
                 localStorage.removeItem("user")
@@ -41,7 +43,24 @@ export default {
         follow(userIdToFollow) {
             userService.followUser({ follow: this.user.id, isFollowed: userIdToFollow }).then(res => {
                 console.log(res.data)
-                this.$router.go("/home");
+                this.componentKey += 1;
+                // this.$router.go("/home");
+            }).catch(err => {
+                console.log(err);
+                localStorage.removeItem("user")
+                this.$router.go("/login");
+            })
+        },
+        loadData() {
+            userService.getFollowedUsers(this.user.id).then(res => {
+                this.followedUsers = res.data;
+                userService.getNotFollowedUsers(this.user.id).then(response => {
+                    this.notFollowedUsers = response.data;
+                }).catch(err => {
+                    console.log(err);
+                    localStorage.removeItem("user")
+                    this.$router.go("/login");
+                })
             }).catch(err => {
                 console.log(err);
                 localStorage.removeItem("user")
@@ -49,21 +68,13 @@ export default {
             })
         }
     },
+    watch: {
+        componentKey() {
+            this.loadData();
+        }
+    },
     mounted() {
-        userService.getFollowedUsers(this.user.id).then(res => {
-            this.followedUsers = res.data;
-            userService.getNotFollowedUsers(this.user.id).then(response => {
-                this.notFollowedUsers = response.data;
-            }).catch(err => {
-                console.log(err);
-                localStorage.removeItem("user")
-                this.$router.go("/login");
-            })
-        }).catch(err => {
-            console.log(err);
-            localStorage.removeItem("user")
-            this.$router.go("/login");
-        })
+        this.loadData();
     }
 }
 </script>

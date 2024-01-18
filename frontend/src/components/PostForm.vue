@@ -17,6 +17,12 @@ import postsService from '@/service/postsService';
 
 export default {
     name: "PostForm",
+    props: {
+        refreshPosts: {
+            type: Function,
+            required: true,
+        },
+    },
     data() {
         return {
             body: '',
@@ -27,16 +33,16 @@ export default {
         createPost() {
             postsService.createPost({ id: uuidv4(), body: this.body, author: this.$store.state.user.login }).then((res) => {
                 console.log(res);
-                this.$router.go("/home")
+                this.refreshPosts();
+                // this.$router.go("/home")
                 // websocket dodac do powiadamiania uzytkowników !!!
             }).catch((err) => {
                 console.log(err)
                 // this.msg = err
             });
 
-            this.login = '';
-            this.email = '';
-            this.password = '';
+            this.body = '';
+            this.msg = '';
         }
     }
 };

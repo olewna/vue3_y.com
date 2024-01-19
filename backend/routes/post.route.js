@@ -17,7 +17,13 @@ const bodyNotEmpty = (obj) => {
 
 post.get("/all/:id", async (req, res) => {
   const result = await postModel.findAll(req.params.id);
-  console.log("GET post /");
+  console.log("GET posts /");
+  res.json(result);
+});
+
+post.get("/allcomments/:id", async (req, res) => {
+  const result = await postModel.findAllComments(req.params.id);
+  console.log("GET comments /");
   res.json(result);
 });
 

@@ -1,5 +1,10 @@
 <template>
     <div class="post">
+        <div class="comment" v-if="post.postId && comment">Odpowiedź do:
+            <div class="link"><router-link :to="'/account/' + post.authorId">&#64;{{ this.comment.author }}</router-link>
+            </div>
+            <div class="post-body">{{ this.comment.body }}</div>
+        </div>
         <div class="link"><router-link :to="'/account/' + post.authorId">&#64;{{ post.author }}</router-link></div>
         <div class="post-body">{{ post.body }}</div>
         <button class="quote-button">Cytuj</button>
@@ -11,6 +16,7 @@
   
 <script>
 import PostForm from '@/components/PostForm.vue';
+import postsService from '@/service/postsService';
 
 export default {
     name: 'Post',
@@ -30,17 +36,36 @@ export default {
     data() {
         return {
             answer: false,
+            comment: null
         }
     },
     methods: {
         showAnswerForm() {
             this.answer = !this.answer;
         }
+    },
+    mounted() {
+        if (this.post.postId) {
+            postsService.getPostById(this.post.postId).then(res => {
+                console.log(res.data)
+                this.comment = res.data;
+            }).catch(err => {
+                console.log(err);
+                localStorage.removeItem("user")
+                this.$router.go("/login");
+            })
+        }
     }
 }
 </script>
 
 <style scoped>
+.comment {
+    border: 1px solid rgb(27, 35, 45);
+    border-radius: 8px;
+    padding: 5px;
+}
+
 .post {
     border: 1px solid rgb(57, 74, 95);
     padding: 10px;

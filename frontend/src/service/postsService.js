@@ -13,6 +13,9 @@ export default {
   getPosts(id) {
     return apiClient.get("/all/" + id);
   },
+  getComments(id) {
+    return apiClient.get("/allcomments/" + id);
+  },
   getPostById(id) {
     return apiClient.get("/" + id);
   },

@@ -1,10 +1,12 @@
 <template>
     <div>
-        <form @submit.prevent="createPost" class="post-form">
-            <input type="text" id="body" v-model="body" placeholder="Co u ciebie?" required>
+        <form @submit.prevent="createPost" class="post-form"
+            v-bind:style="[this.answerForm ? 'padding: 0; margin-top: 10px; box-shadow: none;' : 'padding: 10px;']">
+            <input v-if="!this.answerForm" type="text" id="body" v-model="body" placeholder="Co u ciebie?" required>
+            <input v-if="this.answerForm" type="text" id="body" v-model="body" placeholder="odpowiedz..." required>
 
             <div class="button-container">
-                <button type="submit" class="submit-button">Dodaj post</button>
+                <button type="submit" class="submit-button">{{ !this.answerForm ? "Dodaj post" : "Odpowiedz" }}</button>
             </div>
             <div>{{ this.msg }}</div>
         </form>
@@ -22,6 +24,14 @@ export default {
             type: Function,
             required: true,
         },
+        answerForm: {
+            type: Boolean,
+            default: false
+        },
+        postId: {
+            type: String,
+            default: ''
+        }
     },
     data() {
         return {
@@ -31,15 +41,19 @@ export default {
     },
     methods: {
         createPost() {
-            postsService.createPost({ id: uuidv4(), body: this.body, author: this.$store.state.user.login }).then((res) => {
-                console.log("Dodano post");
-                this.refreshPosts();
-                // this.$router.go("/home")
-                // websocket dodac do powiadamiania uzytkowników !!!
-            }).catch((err) => {
-                console.log(err)
-                // this.msg = err
-            });
+            if (this.answerForm) {
+                console.log("answer form works")
+            } else {
+                postsService.createPost({ id: uuidv4(), body: this.body, author: this.$store.state.user.login }).then((res) => {
+                    console.log("Dodano post");
+                    this.refreshPosts();
+                    // this.$router.go("/home")
+                    // websocket dodac do powiadamiania uzytkowników !!!
+                }).catch((err) => {
+                    console.log(err)
+                    // this.msg = err
+                });
+            }
 
             this.body = '';
             this.msg = '';

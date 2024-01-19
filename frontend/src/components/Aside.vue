@@ -81,7 +81,7 @@ export default {
 
 <style scoped>
 .users {
-    min-width: 200px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;

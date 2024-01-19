@@ -3,17 +3,38 @@
         <div class="link"><router-link :to="'/account/' + post.authorId">&#64;{{ post.author }}</router-link></div>
         <div class="post-body">{{ post.body }}</div>
         <button class="quote-button">Cytuj</button>
-        <button class="reply-button">Odpowiedz</button>
+        <button class="reply-button" @click="showAnswerForm">Odpowiedz</button>
+        <PostForm v-if="this.answer" :refreshPosts="this.refreshPosts" :answerForm="true" :postId="post.id" />
+
     </div>
 </template>
   
 <script>
+import PostForm from '@/components/PostForm.vue';
+
 export default {
     name: 'Post',
+    components: {
+        PostForm
+    },
     props: {
         post: {
             type: Object,
             required: true
+        },
+        refreshPosts: {
+            type: Function,
+            required: true,
+        },
+    },
+    data() {
+        return {
+            answer: false,
+        }
+    },
+    methods: {
+        showAnswerForm() {
+            this.answer = !this.answer;
         }
     }
 }

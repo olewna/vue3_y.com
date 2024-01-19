@@ -5,7 +5,7 @@
         <div class="home">
             <h1>Home!</h1>
             <PostForm :refreshPosts="addComponentKey" />
-            <Post v-if="postsExists" v-for="post in posts" :key="post.id" :post="post" />
+            <Post v-if="postsExists" v-for="post in posts" :key="post.id" :post="post" :refreshPosts="addComponentKey" />
             <div v-else>No posts...</div>
         </div>
     </div>

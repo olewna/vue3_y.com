@@ -13,8 +13,8 @@ export default {
   getPosts(id) {
     return apiClient.get("/all/" + id);
   },
-  getComments(id) {
-    return apiClient.get("/allcomments/" + id);
+  getQuotes(id) {
+    return apiClient.get("/allquotes/" + id);
   },
   getPostById(id) {
     return apiClient.get("/" + id);
@@ -25,8 +25,8 @@ export default {
   createPost(post) {
     return apiClient.post("/", post);
   },
-  createComment(comment, userId, postId) {
-    return apiClient.post("/comment", { comment, userId, postId });
+  createQuote(quote, userId, postId) {
+    return apiClient.post("/quote", { quote, userId, postId });
   },
   deletePost(id) {
     return apiClient.delete("/" + id);

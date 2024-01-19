@@ -63,7 +63,7 @@ export default {
                     localStorage.removeItem("user")
                     this.$router.go("/login");
                 })
-            postsService.getComments(this.user.id).then(res => {
+            postsService.getQuotes(this.user.id).then(res => {
                 this.posts = [...res.data, ...this.posts];
             }).catch(err => {
                 console.log(err);

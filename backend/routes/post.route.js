@@ -21,9 +21,9 @@ post.get("/all/:id", async (req, res) => {
   res.json(result);
 });
 
-post.get("/allcomments/:id", async (req, res) => {
-  const result = await postModel.findAllComments(req.params.id);
-  console.log("GET comments /");
+post.get("/allquotes/:id", async (req, res) => {
+  const result = await postModel.findAllQuotes(req.params.id);
+  console.log("GET quotes /");
   res.json(result);
 });
 
@@ -48,16 +48,16 @@ post.post("/", async (req, res) => {
   res.json(result);
 });
 
-post.post("/comment", async (req, res) => {
+post.post("/quote", async (req, res) => {
   if (!bodyNotEmpty(req.body)) {
     res.status(401).send("Body is missing parameters");
   }
-  const result = await postModel.createAnswer(
-    req.body.comment,
+  const result = await postModel.createQuote(
+    req.body.quote,
     req.body.userId,
     req.body.postId
   );
-  console.log("POST post comment /comment");
+  console.log("POST post quote /quote");
   res.json(result);
 });
 

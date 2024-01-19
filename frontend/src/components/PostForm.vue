@@ -1,12 +1,12 @@
 <template>
     <div>
         <form @submit.prevent="createPost" class="post-form"
-            v-bind:style="[this.answerForm ? 'padding: 0; margin-top: 10px; box-shadow: none;' : 'padding: 10px;']">
-            <input v-if="!this.answerForm" type="text" id="body" v-model="body" placeholder="Co u ciebie?" required>
-            <input v-if="this.answerForm" type="text" id="body" v-model="body" placeholder="odpowiedz..." required>
+            v-bind:style="[this.quoteForm ? 'padding: 0; margin-top: 10px; box-shadow: none;' : 'padding: 10px;']">
+            <input v-if="!this.quoteForm" type="text" id="body" v-model="body" placeholder="Co u ciebie?" required>
+            <input v-if="this.quoteForm" type="text" id="body" v-model="body" placeholder="Cytuj..." required>
 
             <div class="button-container">
-                <button type="submit" class="submit-button">{{ !this.answerForm ? "Dodaj post" : "Odpowiedz" }}</button>
+                <button type="submit" class="submit-button">{{ !this.quoteForm ? "Dodaj post" : "Dodaj cytat" }}</button>
             </div>
             <div>{{ this.msg }}</div>
         </form>
@@ -24,7 +24,7 @@ export default {
             type: Function,
             required: true,
         },
-        answerForm: {
+        quoteForm: {
             type: Boolean,
             default: false
         },
@@ -41,9 +41,9 @@ export default {
     },
     methods: {
         createPost() {
-            if (this.answerForm) {
-                postsService.createComment({ id: uuidv4(), body: this.body }, this.$store.state.user.id, this.postId).then((res) => {
-                    console.log("dodano komentarz")
+            if (this.quoteForm) {
+                postsService.createQuote({ id: uuidv4(), body: this.body }, this.$store.state.user.id, this.postId).then((res) => {
+                    console.log("dodano cytat")
                     this.refreshPosts();
                 })
             } else {

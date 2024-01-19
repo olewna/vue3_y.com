@@ -1,15 +1,16 @@
 <template>
     <div class="post">
-        <div class="comment" v-if="post.postId && comment">Odpowiedź do:
-            <div class="link"><router-link :to="'/account/' + post.authorId">&#64;{{ this.comment.author }}</router-link>
-            </div>
-            <div class="post-body">{{ this.comment.body }}</div>
-        </div>
         <div class="link"><router-link :to="'/account/' + post.authorId">&#64;{{ post.author }}</router-link></div>
         <div class="post-body">{{ post.body }}</div>
-        <button class="quote-button">Cytuj</button>
-        <button class="reply-button" @click="showAnswerForm">Odpowiedz</button>
-        <PostForm v-if="this.answer" :refreshPosts="this.refreshPosts" :answerForm="true" :postId="post.id" />
+        <button class="quote-button" @click="showQuoteForm">Cytuj</button>
+        <button class="reply-button">Odpowiedz</button>
+        <div class="quote" v-if="post.postId && quoted">
+            <div class="link"><router-link :to="'/account/' + this.quoted.author">&#64;{{ this.quoted.author
+            }}</router-link>
+            </div>
+            <div class="post-body">{{ this.quoted.body }}</div>
+        </div>
+        <PostForm v-if="this.isQuote" :refreshPosts="this.refreshPosts" :quoteForm="true" :postId="post.id" />
 
     </div>
 </template>
@@ -35,20 +36,20 @@ export default {
     },
     data() {
         return {
-            answer: false,
-            comment: null
+            isQuote: false,
+            quoted: null
         }
     },
     methods: {
-        showAnswerForm() {
-            this.answer = !this.answer;
+        showQuoteForm() {
+            this.isQuote = !this.isQuote;
         }
     },
     mounted() {
         if (this.post.postId) {
             postsService.getPostById(this.post.postId).then(res => {
                 console.log(res.data)
-                this.comment = res.data;
+                this.quoted = res.data;
             }).catch(err => {
                 console.log(err);
                 localStorage.removeItem("user")
@@ -60,10 +61,11 @@ export default {
 </script>
 
 <style scoped>
-.comment {
+.quote {
     border: 1px solid rgb(27, 35, 45);
     border-radius: 8px;
     padding: 5px;
+    margin-top: 10px;
 }
 
 .post {
@@ -91,7 +93,6 @@ a {
     width: 100%;
     text-align: left;
     height: auto;
-    min-height: 50px;
 }
 
 button {

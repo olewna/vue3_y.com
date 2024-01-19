@@ -9,14 +9,14 @@ const findAll = async (id) => {
     const result =
       await session.run(`MATCH (follower:User {id: '${id}'})-[:Follows]->(followed:User)
       MATCH (followed)-[:Wrote]->(post:Post)
-      WHERE NOT ()<-[:AnswerTo]-(post)
+      WHERE NOT ()<-[:Quotes]-(post)
       WITH post, followed.id AS authorId, followed.login AS author
       RETURN post, authorId, author
       
       UNION
       
       MATCH (user:User {id: '${id}'})-[:Wrote]->(post:Post)
-      WHERE NOT ()<-[:AnswerTo]-(post)
+      WHERE NOT ()<-[:Quotes]-(post)
       RETURN post, user.id AS authorId, user.login AS author
       
     `);
@@ -32,26 +32,26 @@ const findAll = async (id) => {
   }
 };
 
-const findAllComments = async (id) => {
+const findAllQuotes = async (id) => {
   const session = driver.session({ database: DB });
   try {
     const result =
       await session.run(`MATCH (follower:User {id: '${id}'})-[:Follows]->(followed:User)
-      MATCH (followed)-[:Wrote]->(comment:Post)-[:AnswerTo]->(post:Post)
-      WITH comment, followed.id AS authorId, followed.login AS author, post.id AS postId
-      RETURN comment, authorId, author, postId
+      MATCH (followed)-[:Wrote]->(quote:Post)-[:Quotes]->(post:Post)
+      WITH quote, followed.id AS authorId, followed.login AS author, post.id AS postId
+      RETURN quote, authorId, author, postId
       
       UNION
       
-      MATCH (user:User {id: '${id}'})-[:Wrote]->(comment:Post)-[:AnswerTo]->(post:Post)
-      RETURN comment, user.id AS authorId, user.login AS author, post.id AS postId
+      MATCH (user:User {id: '${id}'})-[:Wrote]->(quote:Post)-[:Quotes]->(post:Post)
+      RETURN quote, user.id AS authorId, user.login AS author, post.id AS postId
     `);
     const records = result.records.map((record) => {
-      const commentProperties = record.get("comment").properties;
+      const quoteProperties = record.get("quote").properties;
       const author = record.get("author");
       const authorId = record.get("authorId");
       const postId = record.get("postId");
-      return { ...commentProperties, author, authorId, postId };
+      return { ...quoteProperties, author, authorId, postId };
     });
     return records;
   } finally {
@@ -109,18 +109,18 @@ const createPost = async (post) => {
   }
 };
 
-const createAnswer = async (answer, userId, answeredPostId) => {
-  const createAnswerQuery = `
+const createQuote = async (quote, userId, quotedPostId) => {
+  const createQuoteQuery = `
     MATCH (user:User {id: '${userId}'})
-    CREATE (user)-[:Wrote]->(comment:Post {id: '${answer.id}', body: "${answer.body}"})
-    WITH user, comment
-    MATCH (post:Post {id: '${answeredPostId}'})
-    CREATE (post)<-[:AnswerTo]-(comment)
+    CREATE (user)-[:Wrote]->(quote:Post {id: '${quote.id}', body: "${quote.body}"})
+    WITH user, quote
+    MATCH (post:Post {id: '${quotedPostId}'})
+    CREATE (post)<-[:Quotes]-(quote)
   `;
   const session = driver.session({ database: DB });
   try {
-    await session.run(createAnswerQuery);
-    return await findById(answer.id);
+    await session.run(createQuoteQuery);
+    return await findById(quote.id);
   } finally {
     await session.close();
   }
@@ -128,9 +128,9 @@ const createAnswer = async (answer, userId, answeredPostId) => {
 
 module.exports = {
   findAll,
-  findAllComments,
+  findAllQuotes,
   findById,
   findPostsByUserId,
   createPost,
-  createAnswer,
+  createQuote,
 };

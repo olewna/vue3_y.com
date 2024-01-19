@@ -3,7 +3,8 @@ import Home from "@/components/views/Home.vue";
 import Login from "@/components/views/Login.vue";
 import Register from "@/components/views/Register.vue";
 import PageNotFound from "@/components/views/PageNotFound.vue";
-import Account from "@/components/Account.vue";
+import Account from "@/components/views/Account.vue";
+import PostDetails from "@/components/views/PostDetails.vue";
 import store from "@/store/store.js";
 
 const routes = [
@@ -31,6 +32,12 @@ const routes = [
     name: "Account",
     props: true,
     component: Account,
+  },
+  {
+    path: "/post/:id",
+    name: "PostDetails",
+    props: true,
+    component: PostDetails,
   },
   {
     path: "/:pathMatch(.*)*",

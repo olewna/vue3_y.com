@@ -5,7 +5,7 @@
             <img src="@/assets/awatar.jpg" alt="awatar_default">
             <div class="user-details">
                 <h2>&#64;{{ user.login }}</h2>
-                <h5>{{ user.id }}</h5>
+                <h5>{{ this.followed ? "Obserwowani: " + this.followed : "Brak obserwowanych" }}</h5>
                 <h3>{{ user.email }}</h3>
             </div>
         </div>
@@ -31,7 +31,8 @@ export default {
     data() {
         return {
             user: null,
-            posts: null
+            posts: [],
+            followed: null
         }
     },
     computed: {
@@ -45,8 +46,22 @@ export default {
     created() {
         userService.getUserById(this.$props.id).then((response) => {
             this.user = response.data;
+            userService.getFollowedUsers(this.$props.id).then(res => {
+                this.followed = res.data.length;
+            }).catch(err => {
+                console.log(err);
+                localStorage.removeItem("user")
+                this.$router.go("/login");
+            })
             postsService.getPostsByUserId(this.$props.id).then((res) => {
-                this.posts = res.data;
+                this.posts = [...res.data, ...this.posts];
+                postsService.getQuotesByUserId(this.$props.id).then((res) => {
+                    this.posts = [...res.data, ...this.posts];
+                }).catch(err => {
+                    console.log(err);
+                    localStorage.removeItem("user")
+                    this.$router.go("/login");
+                })
             }).catch(err => {
                 console.log(err);
                 localStorage.removeItem("user")

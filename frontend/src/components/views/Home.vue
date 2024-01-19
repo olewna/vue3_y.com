@@ -56,7 +56,7 @@ export default {
             postsService.getPosts(this.user.id)
                 .then(res => {
                     // console.log(res.data);
-                    this.posts = [...res.data, ...this.posts];
+                    this.posts = res.data;
                 })
                 .catch(err => {
                     console.log(err);

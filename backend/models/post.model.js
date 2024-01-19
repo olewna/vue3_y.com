@@ -63,12 +63,13 @@ const findById = async (id) => {
   const session = driver.session({ database: DB });
   try {
     const result = await session.run(
-      `MATCH (user:User)-[:Wrote]->(post:Post {id : '${id}'}) RETURN user.login AS author, post LIMIT 1`
+      `MATCH (user:User)-[:Wrote]->(post:Post {id : '${id}'}) RETURN user.login AS author, user.id AS authorId, post LIMIT 1`
     );
     const records = result.records.map((record) => {
       const author = record.get("author");
+      const authorId = record.get("authorId");
       const post = record.get("post").properties;
-      return { ...post, author };
+      return { ...post, author, authorId };
     });
     return records[0];
   } finally {
@@ -79,14 +80,35 @@ const findById = async (id) => {
 const findPostsByUserId = async (id) => {
   const session = driver.session({ database: DB });
   try {
-    const result = await session.run(
-      `MATCH (user:User {id: '${id}'})-[:Wrote]->(post:Post)
-      RETURN post, user.login AS author`
-    );
+    const result = await session.run(`
+      MATCH (user:User {id: '${id}'})-[:Wrote]->(post:Post)
+      WHERE NOT ()<-[:Quotes]-(post)
+      RETURN post, user.id AS authorId, user.login AS author
+      `);
     const records = result.records.map((record) => {
       const postProperties = record.get("post").properties;
       const author = record.get("author");
-      return { ...postProperties, author };
+      const authorId = record.get("authorId");
+      return { ...postProperties, author, authorId };
+    });
+    return records;
+  } finally {
+    await session.close();
+  }
+};
+const findQuotesByUserId = async (id) => {
+  const session = driver.session({ database: DB });
+  try {
+    const result = await session.run(`
+      MATCH (user:User {id: '${id}'})-[:Wrote]->(quote:Post)-[:Quotes]->(post:Post)
+      RETURN quote, user.id AS authorId, user.login AS author, post.id AS postId
+      `);
+    const records = result.records.map((record) => {
+      const postProperties = record.get("quote").properties;
+      const author = record.get("author");
+      const authorId = record.get("authorId");
+      const postId = record.get("postId");
+      return { ...postProperties, author, authorId, postId };
     });
     return records;
   } finally {
@@ -131,6 +153,7 @@ module.exports = {
   findAllQuotes,
   findById,
   findPostsByUserId,
+  findQuotesByUserId,
   createPost,
   createQuote,
 };

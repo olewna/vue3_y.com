@@ -1,14 +1,18 @@
 <template>
     <div class="users">
-        <div>Obserwowani:</div>
-        <div class="followed" v-if="followedUsers" v-for="user in followedUsers">
-            {{ user.login }}
-            <button @click="unfollow(user.id)">Przestań obserwować</button>
+        <div class="container-followed" v-if="followedUsers.length > 0">
+            <div>Obserwowani: {{ followedUsers.length }}</div>
+            <div class="followed" v-for="user in followedUsers">
+                <div class="link" @click="redirectToAccount(user.id)">{{ user.login }}</div>
+                <button @click="unfollow(user.id)">Przestań obserwować</button>
+            </div>
         </div>
-        <div>Możliwe, że znasz:</div>
-        <div class="not-followed" v-if="notFollowedUsers" v-for="user in notFollowedUsers">
-            {{ user.login }}
-            <button @click="follow(user.id)">Obserwuj</button>
+        <div class="container-not-followed" v-if="notFollowedUsers.length > 0">
+            <div>Możliwe, że znasz:</div>
+            <div class="not-followed" v-for="user in notFollowedUsers">
+                <div class="link" @click="redirectToAccount(user.id)">{{ user.login }}</div>
+                <button @click="follow(user.id)">Obserwuj</button>
+            </div>
         </div>
     </div>
 </template>
@@ -23,8 +27,8 @@ export default {
     },
     data() {
         return {
-            followedUsers: null,
-            notFollowedUsers: null,
+            followedUsers: [],
+            notFollowedUsers: [],
             componentKey: 0
         }
     },
@@ -66,6 +70,9 @@ export default {
                 localStorage.removeItem("user")
                 this.$router.go("/login");
             })
+        },
+        redirectToAccount(authorId) {
+            this.$router.push('/account/' + authorId);
         }
     },
     watch: {
@@ -80,6 +87,14 @@ export default {
 </script>
 
 <style scoped>
+.link {
+    cursor: pointer;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
 .users {
     margin: 0 auto;
     display: flex;

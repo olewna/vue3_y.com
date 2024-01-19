@@ -1,17 +1,14 @@
 <template>
-    <div class="post">
-        <div class="link"><router-link :to="'/account/' + post.authorId">&#64;{{ post.author }}</router-link></div>
+    <div class="post" @click="redirectToPost(post.id)">
+        <div class="link" @click="redirectToAccount(post.authorId)">&#64;{{ post.author }}</div>
         <div class="post-body">{{ post.body }}</div>
-        <button class="quote-button" @click="showQuoteForm">Cytuj</button>
-        <button class="reply-button">Odpowiedz</button>
-        <div class="quote" v-if="post.postId && quoted">
-            <div class="link"><router-link :to="'/account/' + this.quoted.author">&#64;{{ this.quoted.author
-            }}</router-link>
-            </div>
+        <div class="quote" @click="redirectToPost(post.postId)" v-if="post.postId && quoted">
+            <div class="link" @click="redirectToAccount(this.quoted.authorId)">&#64;{{ this.quoted.author }}</div>
             <div class="post-body">{{ this.quoted.body }}</div>
         </div>
+        <button class="quote-button" @click="showQuoteForm">Cytuj</button>
+        <button class="reply-button">Odpowiedz</button>
         <PostForm v-if="this.isQuote" :refreshPosts="this.refreshPosts" :quoteForm="true" :postId="post.id" />
-
     </div>
 </template>
   
@@ -31,7 +28,6 @@ export default {
         },
         refreshPosts: {
             type: Function,
-            required: true,
         },
     },
     data() {
@@ -43,12 +39,17 @@ export default {
     methods: {
         showQuoteForm() {
             this.isQuote = !this.isQuote;
+        },
+        redirectToPost(id) {
+            this.$router.push("/post/" + id)
+        },
+        redirectToAccount(authorId) {
+            this.$router.push('/account/' + authorId);
         }
     },
     mounted() {
         if (this.post.postId) {
             postsService.getPostById(this.post.postId).then(res => {
-                console.log(res.data)
                 this.quoted = res.data;
             }).catch(err => {
                 console.log(err);
@@ -76,14 +77,22 @@ export default {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
+    cursor: pointer;
 }
 
 .link {
-    width: 100%;
+    width: fit-content;
+    color: black;
     text-align: left;
+    cursor: pointer;
+}
+
+.link:hover {
+    text-decoration: underline;
 }
 
 a {
+    text-decoration: none;
     color: black;
 }
 

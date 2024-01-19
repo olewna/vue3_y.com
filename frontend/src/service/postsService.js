@@ -22,6 +22,9 @@ export default {
   getPostsByUserId(id) {
     return apiClient.get("/user/" + id);
   },
+  getQuotesByUserId(id) {
+    return apiClient.get("/user/quotes/" + id);
+  },
   createPost(post) {
     return apiClient.post("/", post);
   },

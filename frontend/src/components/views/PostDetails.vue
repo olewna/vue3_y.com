@@ -1,4 +1,5 @@
 <template>
+    <Navbar :user="user" />
     <div class="container" v-if="this.post">
         <Post :post="this.post" />
         <router-link to="/home">Strona główna</router-link>
@@ -8,12 +9,18 @@
 <script>
 import postsService from '@/service/postsService';
 import Post from "@/components/Post.vue"
+import { mapGetters } from "vuex";
+import Navbar from "@/components/Navbar.vue";
 
 export default {
     name: "PostDetails",
     props: ["id"],
     components: {
-        Post
+        Post,
+        Navbar
+    },
+    computed: {
+        ...mapGetters({ user: "getUser" }),
     },
     data() {
         return {
@@ -31,3 +38,15 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+</style>

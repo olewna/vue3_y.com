@@ -1,4 +1,5 @@
 <template>
+    <Navbar :user="actualUser" />
     <div class="account" v-if="user">
         <h1>Account</h1>
         <div class="user-info">
@@ -21,42 +22,48 @@
 import userService from '@/service/userService';
 import postsService from '@/service/postsService.js';
 import Post from "@/components/Post.vue";
+import Navbar from "@/components/Navbar.vue";
+import { mapGetters } from "vuex";
 
 export default {
     name: 'Account',
     props: ['id'],
     components: {
-        Post
+        Post,
+        Navbar
     },
     data() {
         return {
             user: null,
             posts: [],
-            followed: null
+            followed: null,
         }
     },
-    computed: {
-        postsExists() {
-            if (this.posts && this.posts.length > 0) {
-                return true
-            }
-            return false
+    watch: {
+        id() {
+            this.getData();
         }
     },
-    created() {
-        userService.getUserById(this.$props.id).then((response) => {
-            this.user = response.data;
-            userService.getFollowedUsers(this.$props.id).then(res => {
-                this.followed = res.data.length;
-            }).catch(err => {
-                console.log(err);
-                localStorage.removeItem("user")
-                this.$router.go("/login");
-            })
-            postsService.getPostsByUserId(this.$props.id).then((res) => {
-                this.posts = [...res.data, ...this.posts];
-                postsService.getQuotesByUserId(this.$props.id).then((res) => {
+    methods: {
+        getData() {
+            userService.getUserById(this.$props.id).then((response) => {
+                this.user = response.data;
+                userService.getFollowedUsers(this.$props.id).then(res => {
+                    this.followed = res.data.length;
+                }).catch(err => {
+                    console.log(err);
+                    localStorage.removeItem("user")
+                    this.$router.go("/login");
+                })
+                postsService.getPostsByUserId(this.$props.id).then((res) => {
                     this.posts = [...res.data, ...this.posts];
+                    postsService.getQuotesByUserId(this.$props.id).then((res) => {
+                        this.posts = [...res.data, ...this.posts];
+                    }).catch(err => {
+                        console.log(err);
+                        localStorage.removeItem("user")
+                        this.$router.go("/login");
+                    })
                 }).catch(err => {
                     console.log(err);
                     localStorage.removeItem("user")
@@ -67,11 +74,19 @@ export default {
                 localStorage.removeItem("user")
                 this.$router.go("/login");
             })
-        }).catch(err => {
-            console.log(err);
-            localStorage.removeItem("user")
-            this.$router.go("/login");
-        })
+        }
+    },
+    computed: {
+        ...mapGetters({ actualUser: "getUser" }),
+        postsExists() {
+            if (this.posts && this.posts.length > 0) {
+                return true
+            }
+            return false
+        },
+    },
+    mounted() {
+        this.getData();
     }
 }
 </script>

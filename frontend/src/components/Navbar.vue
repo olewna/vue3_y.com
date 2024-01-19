@@ -1,11 +1,10 @@
-import loginService from '@/service/loginService';
 <template>
     <div class="navbar">
         <div class="brand">„Serwis Y”</div> |
         <router-link to="/home" class="nav-link">Strona główna</router-link> |
-        <router-link class="account nav-link" :to="'/account/' + this.user.id">
+        <div class="account nav-link" @click="redirectToAccount(this.user.id)">
             Konto {{ user.login }} <img src="@/assets/awatar.jpg" alt="awatar_default">
-        </router-link> |
+        </div> |
         <div class="logout nav-link" @click="logout">Wyloguj</div>
     </div>
 </template>
@@ -16,7 +15,7 @@ import loginService from "@/service/loginService.js";
 export default {
     name: "Navbar",
     props: {
-        user: Object
+        user: Object,
     },
     methods: {
         logout() {
@@ -27,6 +26,9 @@ export default {
             }).catch((err) => {
                 console.log(err)
             })
+        },
+        redirectToAccount(authorId) {
+            this.$router.push({ path: '/account/' + authorId });
         }
     },
 }
@@ -57,7 +59,7 @@ export default {
     text-decoration: underline;
 }
 
-a.account {
+div.account {
     display: flex;
     align-items: center;
 }

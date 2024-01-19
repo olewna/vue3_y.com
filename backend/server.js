@@ -1,7 +1,6 @@
 const express = require("express");
 require("dotenv").config();
 const fs = require("fs");
-const WebSocket = require("ws");
 const path = require("path");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -17,8 +16,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "http://localhost:5173");
-  // res.header("Access-Control-Allow-Origin", "https://172.19.160.1:5173");
-  // res.header("Access-Control-Allow-Origin", "https://172.19.193.51:5173");
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
@@ -29,11 +26,7 @@ app.use((req, res, next) => {
 });
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      // "https://172.19.160.1:5173",
-      // "https://172.19.193.51:5173",
-    ],
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["X-Requested-With", "content-type"],
     credentials: true,
@@ -70,18 +63,53 @@ const server = require("http").createServer(app);
 // );
 
 // WEBSOCKET
-const wss = new WebSocket.Server({ server });
+// const wss = new WebSocket.Server({ server });
+const sio = require("socket.io")(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+  transports: ["websocket", "polling"],
+});
+const wrap = (middleware) => (socket, next) =>
+  middleware(socket.request, {}, next);
 
-wss.on("connection", (ws) => {
+sio.use(
+  wrap(
+    require("express-session")({
+      secret: process.env.APP_SECRET || "$sekretny $sekret",
+      saveUninitialized: false,
+      resave: false,
+    })
+  )
+);
+sio.use(
+  wrap(
+    cookieSession({
+      name: "mysession",
+      keys: ["$sekretny $sekret"],
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    })
+  )
+);
+sio.use(wrap(passport.initialize()));
+sio.use(wrap(passport.session()));
+
+sio.use((socket, next) => {
+  if (socket.request.user) {
+    next();
+  } else {
+    next(new Error("Brak autoryzacji!"));
+  }
+});
+
+sio.on("connect", async (socket) => {
   console.log("Nowe połączenie WebSocket");
 
-  // Nasłuchiwanie wiadomości od klienta WebSocket
-  ws.on("message", (message) => {
-    console.log(`Odebrano wiadomość: ${message}`);
+  socket.on("message", (message) => {
+    console.log(`Odebrano wiadomość: ${message.text}`);
   });
-
-  // Wysyłanie wiadomości do klienta WebSocket
-  ws.send("Witaj, połączono z serwerem WebSocket z SSL!");
 });
 
 // PASSPORT

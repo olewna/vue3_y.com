@@ -31,7 +31,7 @@ export default {
     methods: {
         unfollow(userIdToUnfollow) {
             userService.unfollowUser({ follow: this.user.id, isFollowed: userIdToUnfollow }).then(res => {
-                console.log(res.data)
+                // console.log(res.data)
                 this.componentKey += 1;
                 // this.$router.go("/home");
             }).catch(err => {
@@ -42,7 +42,7 @@ export default {
         },
         follow(userIdToFollow) {
             userService.followUser({ follow: this.user.id, isFollowed: userIdToFollow }).then(res => {
-                console.log(res.data)
+                // console.log(res.data)
                 this.componentKey += 1;
                 // this.$router.go("/home");
             }).catch(err => {

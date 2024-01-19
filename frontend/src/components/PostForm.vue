@@ -32,7 +32,7 @@ export default {
     methods: {
         createPost() {
             postsService.createPost({ id: uuidv4(), body: this.body, author: this.$store.state.user.login }).then((res) => {
-                console.log(res);
+                console.log("Dodano post");
                 this.refreshPosts();
                 // this.$router.go("/home")
                 // websocket dodac do powiadamiania uzytkowników !!!

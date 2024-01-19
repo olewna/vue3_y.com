@@ -3,29 +3,34 @@
 </template>
 
 <script>
+import { io } from "socket.io-client";
 
 export default {
   name: "App",
-  data: function () {
+  data() {
     return {
-      connection: null
+      socket: null
     }
   },
-  created: function () {
-    console.log("Starting web socket server");
-    this.connection = new WebSocket("ws://localhost:3069");
-
-    this.connection.onmessage = function (event) {
-      console.log(event.data)
+  methods: {
+    createSocketConnection() {
+      const URL = process.env.NODE_ENV === "production" ? undefined : "http://localhost:3069";
+      this.socket = io(URL, {
+        // autoConnect: false,
+        withCredentials: true
+      });
     }
+  },
+  created() {
+    this.createSocketConnection();
+  },
+  mounted() {
+    this.socket.emit('message', { text: "elo" })
 
-    this.connection.onopen = function (event) {
-      console.log("success connection ")
-    }
   },
   beforeCreate() {
     const userData = localStorage.getItem('user');
-    console.log(JSON.parse(userData))
+    // console.log(JSON.parse(userData))
     if (userData) {
       this.$store.commit('SET_USER', JSON.parse(userData));
       this.$store.commit("SET_ISLOGGED", true)

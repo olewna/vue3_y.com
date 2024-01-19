@@ -22,6 +22,9 @@ export default {
   createPost(post) {
     return apiClient.post("/", post);
   },
+  createComment(comment, userId, postId) {
+    return apiClient.post("/comment", { comment, userId, postId });
+  },
   deletePost(id) {
     return apiClient.delete("/" + id);
   },

@@ -60,17 +60,33 @@ const findPostsByUserId = async (id) => {
   }
 };
 
-const create = async (post) => {
-  const createRelationQuery = `
+const createPost = async (post) => {
+  const createPostQuery = `
     MATCH (user:User {login: '${post.author}'})
     CREATE (user)-[:Wrote]->(post:Post {id: '${post.id}', body: '${post.body}'})
-    RETURN post
   `;
   const session = driver.session({ database: DB });
 
   try {
-    await session.run(createRelationQuery);
+    await session.run(createPostQuery);
     return await findById(post.id);
+  } finally {
+    await session.close();
+  }
+};
+
+const createAnswer = async (answer, userId, answeredPostId) => {
+  const createAnswerQuery = `
+    MATCH (user:User {id: '${userId}'})
+    CREATE (user)-[:Wrote]->(comment:Post {id: '${answer.id}', body: "${answer.body}"})
+    WITH user, comment
+    MATCH (post:Post {id: '${answeredPostId}'})
+    CREATE (post)<-[:AnswerTo]-(comment)
+  `;
+  const session = driver.session({ database: DB });
+  try {
+    await session.run(createAnswerQuery);
+    return await findById(answer.id);
   } finally {
     await session.close();
   }
@@ -80,5 +96,6 @@ module.exports = {
   findAll,
   findById,
   findPostsByUserId,
-  create,
+  createPost,
+  createAnswer,
 };

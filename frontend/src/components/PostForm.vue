@@ -42,7 +42,10 @@ export default {
     methods: {
         createPost() {
             if (this.answerForm) {
-                console.log("answer form works")
+                postsService.createComment({ id: uuidv4(), body: this.body }, this.$store.state.user.id, this.postId).then((res) => {
+                    console.log("dodano komentarz")
+                    this.refreshPosts();
+                })
             } else {
                 postsService.createPost({ id: uuidv4(), body: this.body, author: this.$store.state.user.login }).then((res) => {
                     console.log("Dodano post");

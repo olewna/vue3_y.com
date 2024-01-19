@@ -37,8 +37,21 @@ post.post("/", async (req, res) => {
   if (!bodyNotEmpty(req.body)) {
     res.status(401).send("Body is missing parameters");
   }
-  const result = await postModel.create(req.body);
+  const result = await postModel.createPost(req.body);
   console.log("POST post /");
+  res.json(result);
+});
+
+post.post("/comment", async (req, res) => {
+  if (!bodyNotEmpty(req.body)) {
+    res.status(401).send("Body is missing parameters");
+  }
+  const result = await postModel.createAnswer(
+    req.body.comment,
+    req.body.userId,
+    req.body.postId
+  );
+  console.log("POST post comment /comment");
   res.json(result);
 });
 

@@ -98,6 +98,11 @@ export default {
     color: white;
 }
 
+.comments:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .bottom {
     display: flex;
     justify-content: space-around;

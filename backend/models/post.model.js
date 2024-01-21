@@ -37,13 +37,13 @@ const findAllQuotes = async (id) => {
   try {
     const result =
       await session.run(`MATCH (follower:User {id: '${id}'})-[:Follows]->(followed:User)
-      MATCH (followed)-[:Wrote]->(quote:Post)-[:Quotes]->(post:Post)
+      MATCH (followed)-[:Wrote]->(quote:Post)-[:Quotes]->(post)
       WITH quote, followed.id AS authorId, followed.login AS author, post.id AS postId
       RETURN quote, authorId, author, postId
       
       UNION
       
-      MATCH (user:User {id: '${id}'})-[:Wrote]->(quote:Post)-[:Quotes]->(post:Post)
+      MATCH (user:User {id: '${id}'})-[:Wrote]->(quote:Post)-[:Quotes]->(post)
       RETURN quote, user.id AS authorId, user.login AS author, post.id AS postId
     `);
     const records = result.records.map((record) => {
@@ -101,7 +101,7 @@ const findQuotesByUserId = async (id) => {
   const session = driver.session({ database: DB });
   try {
     const result = await session.run(`
-      MATCH (user:User {id: '${id}'})-[:Wrote]->(quote:Post)-[:Quotes]->(post:Post)
+      MATCH (user:User {id: '${id}'})-[:Wrote]->(quote:Post)-[:Quotes]->(post)
       RETURN quote, user.id AS authorId, user.login AS author, post.id AS postId
       `);
     const records = result.records.map((record) => {
@@ -156,7 +156,7 @@ const createQuote = async (quote, userId, quotedPostId) => {
     MATCH (user:User {id: '${userId}'})
     CREATE (user)-[:Wrote]->(quote:Post {id: '${quote.id}', body: "${quote.body}", createdAt: "${quote.createdAt}"})
     WITH user, quote
-    MATCH (post:Post {id: '${quotedPostId}'})
+    MATCH (post {id: '${quotedPostId}'})
     CREATE (post)<-[:Quotes]-(quote)
   `;
   const session = driver.session({ database: DB });

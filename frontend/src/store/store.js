@@ -1,4 +1,5 @@
 import { createStore } from "vuex";
+import { io } from "socket.io-client";
 
 const store = createStore({
   state: {
@@ -8,6 +9,7 @@ const store = createStore({
       email: "",
       id: "",
     },
+    socket: null,
   },
   getters: {
     getUser(state) {
@@ -21,6 +23,17 @@ const store = createStore({
     setIsLogged({ commit }, payload) {
       commit("SET_ISLOGGED", payload);
     },
+    initializeSocket({ commit }) {
+      const URL =
+        process.env.NODE_ENV === "production"
+          ? undefined
+          : "http://localhost:3069";
+      const socket = io(URL, {
+        // autoConnect: false,
+        withCredentials: true,
+      });
+      commit("SET_SOCKET", socket);
+    },
   },
   mutations: {
     SET_USER(state, payload) {
@@ -28,6 +41,9 @@ const store = createStore({
     },
     SET_ISLOGGED(state, payload) {
       state.logged = payload;
+    },
+    SET_SOCKET(state, payload) {
+      state.socket = payload;
     },
   },
 });

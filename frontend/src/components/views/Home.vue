@@ -5,6 +5,8 @@
         <div class="home">
             <h1>Home!</h1>
             <PostForm :refreshPosts="addComponentKey" />
+            <div v-if="this.newPosts" class="button-container"><button @click="this.getData()">Nowe posty
+                    obserwowanych</button></div>
             <Post v-if="postsExists" v-for="post in posts" :key="post.id" :post="post" :refreshPosts="addComponentKey" />
             <div v-else>No posts...</div>
         </div>
@@ -34,7 +36,8 @@ export default {
     data() {
         return {
             posts: [],
-            componentKey: 0
+            componentKey: 0,
+            newPosts: false
         }
     },
     computed: {
@@ -70,6 +73,7 @@ export default {
                     localStorage.removeItem("user")
                     this.$router.go("/login");
                 })
+            this.newPosts = false;
         },
         addComponentKey() {
             this.componentKey += 1;
@@ -77,6 +81,10 @@ export default {
     },
     mounted() {
         this.getData();
+        this.$store.state.socket.on("newPost", () => {
+            console.log("Otrzymano nowy post!");
+            this.newPosts = true;
+        })
     },
 }
 </script>
@@ -89,5 +97,25 @@ export default {
 .home {
     max-width: 500px;
     margin: 0 auto;
+}
+
+.button-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+}
+
+button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #2980b9;
 }
 </style>

@@ -105,11 +105,30 @@ sio.use((socket, next) => {
 });
 
 sio.on("connect", async (socket) => {
+  const userModel = require("./models/user.model");
   console.log("Nowe połączenie WebSocket");
+  console.log("Logged user: " + socket.request.session.passport.user);
+  const userId = socket.request.session.passport.user;
+  socket.join(userId);
 
-  socket.on("message", (message) => {
-    console.log(`Odebrano wiadomość: ${message.text}`);
-  });
+  try {
+    socket.on("created", async () => {
+      const followedUsers = await userModel.findUsersThatFollow(userId);
+      followedUsers.forEach(async (followedUser) => {
+        const roomId = followedUser.id;
+        socket.join(roomId);
+        socket.to(roomId).emit("newPost");
+        socket.leave(roomId);
+      });
+    });
+
+    socket.on("disconnect", () => {
+      socket.leave(userId);
+      console.log("Wylogowano: " + userId);
+    });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 // PASSPORT

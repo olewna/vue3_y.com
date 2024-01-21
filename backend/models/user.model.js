@@ -30,6 +30,19 @@ const findFollowedUsers = async (id) => {
   }
 };
 
+const findUsersThatFollow = async (id) => {
+  const session = driver.session({ database: DB });
+  try {
+    const result = await session.run(
+      `MATCH (u:User)-[:Follows]->(user:User {id: '${id}'}) RETURN u`
+    );
+    const records = result.records.map((record) => record.get("u").properties);
+    return records;
+  } finally {
+    await session.close();
+  }
+};
+
 const findNotFollowedUsers = async (id) => {
   const session = driver.session({ database: DB });
   try {
@@ -146,4 +159,5 @@ module.exports = {
   deleteFollowRelation,
   findByEmail,
   findByLoginOrEmail,
+  findUsersThatFollow,
 };

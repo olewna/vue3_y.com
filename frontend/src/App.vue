@@ -3,7 +3,6 @@
 </template>
 
 <script>
-import { io } from "socket.io-client";
 
 export default {
   name: "App",
@@ -14,19 +13,11 @@ export default {
   },
   methods: {
     createSocketConnection() {
-      const URL = process.env.NODE_ENV === "production" ? undefined : "http://localhost:3069";
-      this.socket = io(URL, {
-        // autoConnect: false,
-        withCredentials: true
-      });
+      this.$store.dispatch("initializeSocket");
     }
   },
   created() {
     this.createSocketConnection();
-  },
-  mounted() {
-    this.socket.emit('message', { text: "elo" })
-
   },
   beforeCreate() {
     const userData = localStorage.getItem('user');

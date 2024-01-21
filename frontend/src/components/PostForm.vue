@@ -52,21 +52,21 @@ export default {
             if (this.quoteForm) {
                 postsService.createQuote({ id: uuidv4(), body: this.body }, this.$store.state.user.id, this.postId).then((res) => {
                     console.log("dodano cytat")
-
+                    this.$store.state.socket.emit("created");
                     this.refreshPosts();
                 })
             } else if (this.commentForm) {
                 postsService.createComment({ id: uuidv4(), body: this.body }, this.$store.state.user.id, this.postId).then(res => {
                     console.log("dodano komentarz");
+                    this.$store.state.socket.emit("created");
                     this.refreshPosts();
                     this.refreshPost();
                 })
             } else {
                 postsService.createPost({ id: uuidv4(), body: this.body, author: this.$store.state.user.login }).then((res) => {
                     console.log("Dodano post");
+                    this.$store.state.socket.emit("created");
                     this.refreshPosts();
-                    // this.$router.go("/home")
-                    // websocket dodac do powiadamiania uzytkowników !!!
                 }).catch((err) => {
                     console.log(err)
                     // this.msg = err

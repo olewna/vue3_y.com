@@ -38,7 +38,6 @@ export default {
                 this.password = '';
 
                 console.log("Zalogowano")
-                // console.log(res)
                 localStorage.setItem("user", JSON.stringify(res.data));
                 this.$router.go("/home")
             }).catch((err) => {

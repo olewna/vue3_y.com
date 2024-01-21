@@ -10,7 +10,6 @@
                 <h3>{{ user.email }}</h3>
             </div>
         </div>
-        <router-link class="home" to="/home">Strona główna</router-link>
         <div v-if="postsExists" class="posts">
             <Post v-for="post in posts" :key="post.id" :post="post" />
         </div>

@@ -63,7 +63,7 @@ const findById = async (id) => {
   const session = driver.session({ database: DB });
   try {
     const result = await session.run(
-      `MATCH (user:User)-[:Wrote]->(post:Post {id : '${id}'}) RETURN user.login AS author, user.id AS authorId, post LIMIT 1`
+      `MATCH (user:User)-[:Wrote]->(post {id : '${id}'}) RETURN user.login AS author, user.id AS authorId, post LIMIT 1`
     );
     const records = result.records.map((record) => {
       const author = record.get("author");
@@ -96,6 +96,7 @@ const findPostsByUserId = async (id) => {
     await session.close();
   }
 };
+
 const findQuotesByUserId = async (id) => {
   const session = driver.session({ database: DB });
   try {
@@ -109,6 +110,25 @@ const findQuotesByUserId = async (id) => {
       const authorId = record.get("authorId");
       const postId = record.get("postId");
       return { ...postProperties, author, authorId, postId };
+    });
+    return records;
+  } finally {
+    await session.close();
+  }
+};
+
+const findCommentsByCommentedPostId = async (id) => {
+  const session = driver.session({ database: DB });
+  try {
+    const result = await session.run(`
+      MATCH (user:User)-[:Wrote]->(comment: Comment)-[:Comments]->(post {id: '${id}'})
+      RETURN comment, user.id AS authorId, user.login AS author
+      `);
+    const records = result.records.map((record) => {
+      const commentProperties = record.get("comment").properties;
+      const author = record.get("author");
+      const authorId = record.get("authorId");
+      return { ...commentProperties, author, authorId };
     });
     return records;
   } finally {
@@ -148,12 +168,31 @@ const createQuote = async (quote, userId, quotedPostId) => {
   }
 };
 
+const createComment = async (comment, userId, commentedPostId) => {
+  const createCommentQuery = `
+    MATCH (user:User {id: '${userId}'})
+    CREATE (user)-[:Wrote]->(comment:Comment {id: '${comment.id}', body: "${comment.body}"})
+    WITH user, comment
+    MATCH (post {id: '${commentedPostId}'})
+    CREATE (post)<-[:Comments]-(comment)
+  `;
+  const session = driver.session({ database: DB });
+  try {
+    await session.run(createCommentQuery);
+    return await findById(comment.id);
+  } finally {
+    await session.close();
+  }
+};
+
 module.exports = {
   findAll,
   findAllQuotes,
   findById,
   findPostsByUserId,
   findQuotesByUserId,
+  findCommentsByCommentedPostId,
   createPost,
   createQuote,
+  createComment,
 };

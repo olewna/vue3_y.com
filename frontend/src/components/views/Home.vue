@@ -57,19 +57,19 @@ export default {
                 .then(res => {
                     // console.log(res.data);
                     this.posts = res.data;
+                    postsService.getQuotes(this.user.id).then(res => {
+                        this.posts = [...res.data, ...this.posts];
+                    }).catch(err => {
+                        console.log(err);
+                        localStorage.removeItem("user")
+                        this.$router.go("/login");
+                    })
                 })
                 .catch(err => {
                     console.log(err);
                     localStorage.removeItem("user")
                     this.$router.go("/login");
                 })
-            postsService.getQuotes(this.user.id).then(res => {
-                this.posts = [...res.data, ...this.posts];
-            }).catch(err => {
-                console.log(err);
-                localStorage.removeItem("user")
-                this.$router.go("/login");
-            })
         },
         addComponentKey() {
             this.componentKey += 1;

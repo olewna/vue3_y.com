@@ -1,8 +1,12 @@
 <template>
     <Navbar :user="user" />
     <div class="container" v-if="this.post">
-        <Post :post="this.post" />
-        <router-link to="/home">Strona główna</router-link>
+        <div class="main-post">
+            <Post :post="this.post" :refreshPosts="addComponentKey" :commenting="true" />
+        </div>
+        <div class="comments">
+            <Post v-for="comment in comments" :post="comment" :refreshPosts="addComponentKey" />
+        </div>
     </div>
 </template>
   
@@ -24,22 +28,52 @@ export default {
     },
     data() {
         return {
-            post: null
+            post: null,
+            componentKey: 0,
+            comments: null
         }
     },
-    created() {
-        postsService.getPostById(this.$props.id).then(res => {
-            this.post = res.data;
-        }).catch(err => {
-            console.log(err);
-            localStorage.removeItem("user")
-            this.$router.go("/login");
-        })
+    watch: {
+        componentKey() {
+            this.getData();
+        },
+        id() {
+            this.getData();
+        }
+    },
+    methods: {
+        addComponentKey() {
+            this.componentKey += 1;
+        },
+        getData() {
+            postsService.getPostById(this.$props.id).then(res => {
+                this.post = res.data;
+                postsService.getComments(this.$props.id).then(res => {
+                    this.comments = res.data;
+                }).catch(err => {
+                    console.log(err);
+                    localStorage.removeItem("user")
+                    this.$router.go("/login");
+                })
+            }).catch(err => {
+                console.log(err);
+                localStorage.removeItem("user")
+                this.$router.go("/login");
+            })
+        }
+    },
+    mounted() {
+        this.getData();
     }
 };
 </script>
 
 <style scoped>
+.comments,
+.main-post {
+    width: 100%;
+}
+
 .container {
     max-width: 600px;
     margin: auto;

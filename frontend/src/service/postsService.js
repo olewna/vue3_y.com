@@ -16,6 +16,9 @@ export default {
   getQuotes(id) {
     return apiClient.get("/allquotes/" + id);
   },
+  getComments(id) {
+    return apiClient.get("/comments/" + id);
+  },
   getPostById(id) {
     return apiClient.get("/" + id);
   },
@@ -30,6 +33,9 @@ export default {
   },
   createQuote(quote, userId, postId) {
     return apiClient.post("/quote", { quote, userId, postId });
+  },
+  createComment(comment, userId, postId) {
+    return apiClient.post("/comment", { comment, userId, postId });
   },
   deletePost(id) {
     return apiClient.delete("/" + id);

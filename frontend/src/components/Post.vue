@@ -1,15 +1,20 @@
 <template>
     <div class="post" @click="redirectToPost(post.id)">
-        <div class="link" @click="redirectToAccount(post.authorId)">&#64;{{ post.author }}</div>
+        <div class="link" @click.stop="redirectToAccount(post.authorId)">&#64;{{ post.author }}</div>
         <div class="post-body">{{ post.body }}</div>
-        <div class="quote" @click="redirectToPost(post.postId)" v-if="post.postId && quoted">
-            <div class="link" @click="redirectToAccount(this.quoted.authorId)">&#64;{{ this.quoted.author }}</div>
+        <div class="quote" @click.stop="redirectToPost(post.postId)" v-if="post.postId && quoted">
+            <div class="link" @click.stop="redirectToAccount(this.quoted.authorId)">&#64;{{ this.quoted.author }}</div>
             <div class="post-body">{{ this.quoted.body }}</div>
         </div>
-        <button class="quote-button" @click="showQuoteForm">Cytuj</button>
-        <button class="reply-button">Odpowiedz</button>
-        <PostForm v-if="this.isQuote" :refreshPosts="this.refreshPosts" :quoteForm="true" :postId="post.id" />
+        <div class="bottom">
+            <button class="quote-button" @click.stop="showQuoteForm">Cytuj</button>
+            <button v-if="!commenting" class="reply-button" @click="redirectToPost(post.id)">Odpowiedz</button>
+            <div class="comments"> Komentarze: {{ numberOfComments }}</div>
+        </div>
+        <PostForm @click.stop v-if="this.isQuote" :refreshPosts="this.refreshPosts" :quoteForm="true" :postId="post.id" />
     </div>
+    <PostForm v-if="commenting" :refreshPosts="this.refreshPosts" :commentForm="true" :postId="post.id"
+        :refreshPost="this.addComponentsKey" />
 </template>
   
 <script>
@@ -27,13 +32,24 @@ export default {
             required: true
         },
         refreshPosts: {
-            type: Function,
+            type: Function
         },
+        commenting: {
+            type: Boolean
+        }
+    },
+    watch: {
+        componentsKey() {
+            this.getData();
+        }
     },
     data() {
         return {
             isQuote: false,
-            quoted: null
+            quoted: null,
+            comments: null,
+            numberOfComments: null,
+            componentsKey: 0
         }
     },
     methods: {
@@ -45,23 +61,48 @@ export default {
         },
         redirectToAccount(authorId) {
             this.$router.push('/account/' + authorId);
-        }
-    },
-    mounted() {
-        if (this.post.postId) {
-            postsService.getPostById(this.post.postId).then(res => {
-                this.quoted = res.data;
+        },
+        addComponentsKey() {
+            this.componentsKey += 1;
+        },
+        getData() {
+            postsService.getComments(this.post.id).then(res => {
+                this.comments = res.data;
+                this.numberOfComments = res.data.length;
             }).catch(err => {
                 console.log(err);
                 localStorage.removeItem("user")
                 this.$router.go("/login");
             })
+            if (this.post.postId) {
+                postsService.getPostById(this.post.postId).then(res => {
+                    this.quoted = res.data;
+
+                }).catch(err => {
+                    console.log(err);
+                    localStorage.removeItem("user")
+                    this.$router.go("/login");
+                })
+            }
         }
+    },
+    mounted() {
+        this.getData();
     }
 }
 </script>
 
 <style scoped>
+.comments {
+    color: white;
+}
+
+.bottom {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
 .quote {
     border: 1px solid rgb(27, 35, 45);
     border-radius: 8px;

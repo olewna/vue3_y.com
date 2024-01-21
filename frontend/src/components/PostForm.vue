@@ -6,7 +6,9 @@
             <input v-if="this.quoteForm" type="text" id="body" v-model="body" placeholder="Cytuj..." required>
 
             <div class="button-container">
-                <button type="submit" class="submit-button">{{ !this.quoteForm ? "Dodaj post" : "Dodaj cytat" }}</button>
+                <button v-if="this.quoteForm" type="submit" class="submit-button">Dodaj cytat</button>
+                <button v-else-if="this.commentForm" type="submit" class="submit-button">Dodaj komentarz</button>
+                <button v-else type="submit" class="submit-button">Dodaj post</button>
             </div>
             <div>{{ this.msg }}</div>
         </form>
@@ -22,9 +24,15 @@ export default {
     props: {
         refreshPosts: {
             type: Function,
-            required: true,
+        },
+        refreshPost: {
+            type: Function
         },
         quoteForm: {
+            type: Boolean,
+            default: false
+        },
+        commentForm: {
             type: Boolean,
             default: false
         },
@@ -44,7 +52,14 @@ export default {
             if (this.quoteForm) {
                 postsService.createQuote({ id: uuidv4(), body: this.body }, this.$store.state.user.id, this.postId).then((res) => {
                     console.log("dodano cytat")
+
                     this.refreshPosts();
+                })
+            } else if (this.commentForm) {
+                postsService.createComment({ id: uuidv4(), body: this.body }, this.$store.state.user.id, this.postId).then(res => {
+                    console.log("dodano komentarz");
+                    this.refreshPosts();
+                    this.refreshPost();
                 })
             } else {
                 postsService.createPost({ id: uuidv4(), body: this.body, author: this.$store.state.user.login }).then((res) => {

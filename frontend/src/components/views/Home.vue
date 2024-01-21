@@ -1,7 +1,7 @@
 <template>
     <Navbar :user="user" />
     <div class="body">
-        <Aside :user="user" />
+        <Aside :user="user" :refreshPosts="addComponentKey" />
         <div class="home">
             <h1>Home!</h1>
             <PostForm :refreshPosts="addComponentKey" />

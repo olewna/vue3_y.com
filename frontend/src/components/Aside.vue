@@ -23,7 +23,10 @@ import userService from '@/service/userService';
 export default {
     name: 'Aside',
     props: {
-        user: Object
+        user: Object,
+        refreshPosts: {
+            type: Function
+        }
     },
     data() {
         return {
@@ -37,6 +40,7 @@ export default {
             userService.unfollowUser({ follow: this.user.id, isFollowed: userIdToUnfollow }).then(res => {
                 // console.log(res.data)
                 this.componentKey += 1;
+                this.refreshPosts();
                 // this.$router.go("/home");
             }).catch(err => {
                 console.log(err);
@@ -48,6 +52,8 @@ export default {
             userService.followUser({ follow: this.user.id, isFollowed: userIdToFollow }).then(res => {
                 // console.log(res.data)
                 this.componentKey += 1;
+                this.refreshPosts();
+
                 // this.$router.go("/home");
             }).catch(err => {
                 console.log(err);
@@ -96,7 +102,7 @@ export default {
 }
 
 .users {
-    margin: 0 auto;
+    max-width: 400px;
     display: flex;
     flex-direction: column;
     align-items: center;

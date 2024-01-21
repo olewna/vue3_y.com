@@ -61,7 +61,7 @@ export default {
                     // console.log(res.data);
                     this.posts = res.data;
                     postsService.getQuotes(this.user.id).then(res => {
-                        this.posts = [...res.data, ...this.posts];
+                        this.posts = [...res.data, ...this.posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                     }).catch(err => {
                         console.log(err);
                         localStorage.removeItem("user")
@@ -95,6 +95,7 @@ export default {
 }
 
 .home {
+    width: 100%;
     max-width: 500px;
     margin: 0 auto;
 }

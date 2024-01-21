@@ -49,7 +49,7 @@ export default {
             postsService.getPostById(this.$props.id).then(res => {
                 this.post = res.data;
                 postsService.getComments(this.$props.id).then(res => {
-                    this.comments = res.data;
+                    this.comments = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 }).catch(err => {
                     console.log(err);
                     localStorage.removeItem("user")

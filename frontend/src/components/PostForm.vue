@@ -50,20 +50,20 @@ export default {
     methods: {
         createPost() {
             if (this.quoteForm) {
-                postsService.createQuote({ id: uuidv4(), body: this.body }, this.$store.state.user.id, this.postId).then((res) => {
+                postsService.createQuote({ createdAt: new Date().toISOString(), id: uuidv4(), body: this.body }, this.$store.state.user.id, this.postId).then((res) => {
                     console.log("dodano cytat")
                     this.$store.state.socket.emit("created");
                     this.refreshPosts();
                 })
             } else if (this.commentForm) {
-                postsService.createComment({ id: uuidv4(), body: this.body }, this.$store.state.user.id, this.postId).then(res => {
+                postsService.createComment({ createdAt: new Date().toISOString(), id: uuidv4(), body: this.body }, this.$store.state.user.id, this.postId).then(res => {
                     console.log("dodano komentarz");
                     this.$store.state.socket.emit("created");
                     this.refreshPosts();
                     this.refreshPost();
                 })
             } else {
-                postsService.createPost({ id: uuidv4(), body: this.body, author: this.$store.state.user.login }).then((res) => {
+                postsService.createPost({ createdAt: new Date().toISOString(), id: uuidv4(), body: this.body, author: this.$store.state.user.login }).then((res) => {
                     console.log("Dodano post");
                     this.$store.state.socket.emit("created");
                     this.refreshPosts();

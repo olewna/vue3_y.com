@@ -139,7 +139,7 @@ const findCommentsByCommentedPostId = async (id) => {
 const createPost = async (post) => {
   const createPostQuery = `
     MATCH (user:User {login: '${post.author}'})
-    CREATE (user)-[:Wrote]->(post:Post {id: '${post.id}', body: '${post.body}'})
+    CREATE (user)-[:Wrote]->(post:Post {id: '${post.id}', body: '${post.body}', createdAt: '${post.createdAt}'})
   `;
   const session = driver.session({ database: DB });
 
@@ -154,7 +154,7 @@ const createPost = async (post) => {
 const createQuote = async (quote, userId, quotedPostId) => {
   const createQuoteQuery = `
     MATCH (user:User {id: '${userId}'})
-    CREATE (user)-[:Wrote]->(quote:Post {id: '${quote.id}', body: "${quote.body}"})
+    CREATE (user)-[:Wrote]->(quote:Post {id: '${quote.id}', body: "${quote.body}", createdAt: "${quote.createdAt}"})
     WITH user, quote
     MATCH (post:Post {id: '${quotedPostId}'})
     CREATE (post)<-[:Quotes]-(quote)
@@ -171,7 +171,7 @@ const createQuote = async (quote, userId, quotedPostId) => {
 const createComment = async (comment, userId, commentedPostId) => {
   const createCommentQuery = `
     MATCH (user:User {id: '${userId}'})
-    CREATE (user)-[:Wrote]->(comment:Comment {id: '${comment.id}', body: "${comment.body}"})
+    CREATE (user)-[:Wrote]->(comment:Comment {id: '${comment.id}', body: "${comment.body}", createdAt: "${comment.createdAt}"})
     WITH user, comment
     MATCH (post {id: '${commentedPostId}'})
     CREATE (post)<-[:Comments]-(comment)

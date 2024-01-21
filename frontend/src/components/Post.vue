@@ -1,6 +1,7 @@
 <template>
     <div class="post" @click="redirectToPost(post.id)">
-        <div class="link" @click.stop="redirectToAccount(post.authorId)">&#64;{{ post.author }}</div>
+        <div class="link" @click.stop="redirectToAccount(post.authorId)">&#64;{{ post.author }} {{ new
+            Date(post.createdAt).toLocaleString() }}</div>
         <div class="post-body">{{ post.body }}</div>
         <div class="quote" @click.stop="redirectToPost(post.postId)" v-if="post.postId && quoted">
             <div class="link" @click.stop="redirectToAccount(this.quoted.authorId)">&#64;{{ this.quoted.author }}</div>

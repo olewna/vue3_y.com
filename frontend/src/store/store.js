@@ -27,7 +27,7 @@ const store = createStore({
       const URL =
         process.env.NODE_ENV === "production"
           ? undefined
-          : "http://localhost:3069";
+          : "https://localhost:3069";
       const socket = io(URL, {
         // autoConnect: false,
         withCredentials: true,

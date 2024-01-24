@@ -51,20 +51,19 @@ const userModel = require("./models/user.model");
 
 // HTTPS
 
-const server = require("http").createServer(app);
+// const server = require("http").createServer(app);
 
-// const sslKeyPath = path.join(__dirname, "ssl", "example.key");
-// const sslCrtPath = path.join(__dirname, "ssl", "example.crt");
-// const server = require("https").createServer(
-//   {
-//     key: fs.readFileSync(sslKeyPath),
-//     cert: fs.readFileSync(sslCrtPath),
-//   },
-//   app
-// );
+const sslKeyPath = path.join(__dirname, "ssl", "example.key");
+const sslCrtPath = path.join(__dirname, "ssl", "example.crt");
+const server = require("https").createServer(
+  {
+    key: fs.readFileSync(sslKeyPath),
+    cert: fs.readFileSync(sslCrtPath),
+  },
+  app
+);
 
 // WEBSOCKET
-// const wss = new WebSocket.Server({ server });
 const sio = require("socket.io")(server, {
   cors: {
     origin: "http://localhost:5173",
@@ -123,7 +122,7 @@ sio.on("connect", async (socket) => {
       });
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async () => {
       socket.leave(userId);
       console.log("Wylogowano: " + userId);
     });

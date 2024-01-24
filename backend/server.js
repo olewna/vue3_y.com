@@ -11,6 +11,7 @@ const passportRoute = require("./routes/passport.route");
 const passport = require("passport");
 const passportLocal = require("passport-local");
 const app = express();
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -193,6 +194,9 @@ const authMiddleware = (req, res, next) => {
 app.use("/api/users", user);
 app.use("/api/posts", authMiddleware, post);
 app.use("/api", passportRoute);
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 server.listen(process.env.PORT, () => {
   console.log(`Serwer Express działa na porcie ${process.env.PORT || 3044}`);
